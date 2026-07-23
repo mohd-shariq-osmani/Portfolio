@@ -1,0 +1,28 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+build/
+dist/
+*.spec
+server/test_token.json
+paired_devices.json
+
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+android/build/
+android/.flutter-plugins
+android/android/local.properties
+android/.flutter-plugins-dependencies
+android/.metadata
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.log
