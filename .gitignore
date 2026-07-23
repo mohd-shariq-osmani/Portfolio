@@ -15,3 +15,6 @@ public/apps/repos/**/.dart_tool/
 public/apps/repos/**/build/
 public/apps/repos/**/Pods/
 public/apps/repos/**/.idea/
+.open-next/
+.wrangler/
+.dev.vars
