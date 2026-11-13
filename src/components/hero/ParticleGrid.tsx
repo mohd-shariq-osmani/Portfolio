@@ -69,8 +69,22 @@ export default function ParticleGrid() {
 
     window.addEventListener("mousemove", handleMouseMove);
 
+    let isVisible = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const wasVisible = isVisible;
+        isVisible = entry.isIntersecting;
+        if (isVisible && !wasVisible) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = requestAnimationFrame(render);
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(canvas);
+
     const render = () => {
-      if (!ctx || !canvas) return;
+      if (!ctx || !canvas || !isVisible) return;
       const w = canvas.width;
       const h = canvas.height;
 
@@ -105,6 +119,7 @@ export default function ParticleGrid() {
     render();
 
     return () => {
+      observer.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
       cancelAnimationFrame(animationFrameId);

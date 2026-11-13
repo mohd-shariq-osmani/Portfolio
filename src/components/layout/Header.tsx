@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Terminal } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { scrollToTarget } from "@/lib/smoothScroll";
 
 const NAV_ITEMS = [
@@ -62,10 +63,17 @@ export default function Header() {
         {/* Brand / Logo */}
         <button
           onClick={() => scrollToSection("#hero")}
-          className="flex items-center gap-2 text-xs font-mono tracking-widest text-mono-300 hover:text-white transition-colors group cursor-pointer"
+          className="flex items-center gap-2.5 text-xs font-mono tracking-widest text-mono-300 hover:text-white transition-colors group cursor-pointer"
         >
-          <div className="w-7 h-7 rounded-full bg-mono-900 border border-mono-700 flex items-center justify-center text-white group-hover:border-mono-400 transition-colors">
-            <Terminal size={13} />
+          <div className="w-8 h-8 rounded-full bg-mono-900 border border-mono-750 flex items-center justify-center p-1 group-hover:border-mono-400 transition-colors shadow-sm overflow-hidden">
+            <Image
+              src="/logo.png"
+              alt="Mohd Shariq Osmani"
+              width={22}
+              height={22}
+              className="object-contain"
+              priority
+            />
           </div>
           <span className="font-semibold tracking-wider text-white">MSO</span>
           <span className="hidden sm:inline-block text-mono-500">// DEV</span>

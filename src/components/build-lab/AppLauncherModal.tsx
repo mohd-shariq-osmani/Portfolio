@@ -23,11 +23,24 @@ export default function AppLauncherModal({ project, onClose }: AppLauncherModalP
     if (!project) return;
     setIsLoading(true);
     setUseFallback(false);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2000);
-    return () => clearTimeout(timer);
-  }, [project?.id, resetKey]);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      clearTimeout(timer);
+    };
+  }, [project?.id, resetKey, onClose]);
 
   if (!project) return null;
 
@@ -53,63 +66,70 @@ export default function AppLauncherModal({ project, onClose }: AppLauncherModalP
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/95 backdrop-blur-2xl"
+        onClick={onClose}
+        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-8 bg-black/95 backdrop-blur-2xl"
       >
         {/* Header Bar */}
-        <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-30">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-mono-900 border border-mono-700 flex items-center justify-center text-white">
-              <Smartphone size={20} />
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between z-30"
+        >
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-mono-900 border border-mono-700 flex items-center justify-center text-white shrink-0">
+              <Smartphone size={18} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white font-display">
+              <h3 className="text-xs sm:text-sm font-bold text-white font-display">
                 {project.title}
               </h3>
-              <p className="text-[11px] font-mono text-mono-400">
+              <p className="text-[10px] sm:text-[11px] font-mono text-mono-400">
                 Build Lab • Active Session
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setUseFallback(!useFallback)}
-              className="px-3 py-1.5 text-mono-300 hover:text-white bg-mono-900 border border-mono-800 rounded-full text-xs font-mono transition-colors"
-            >
-              {useFallback ? "Switch to Web" : "Switch to Sim"}
-            </button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            {project.type === "flutter-web" && (
+              <button
+                onClick={() => setUseFallback(!useFallback)}
+                className="hidden sm:inline-flex px-3 py-1.5 text-mono-300 hover:text-white bg-mono-900 border border-mono-800 rounded-full text-xs font-mono transition-colors"
+              >
+                {useFallback ? "Switch to Web" : "Switch to Sim"}
+              </button>
+            )}
             <button
               onClick={() => {
                 setUseFallback(false);
                 setIsLoading(true);
                 setResetKey((k) => k + 1);
               }}
-              className="p-2.5 text-mono-400 hover:text-white bg-mono-900 border border-mono-800 rounded-full transition-colors cursor-pointer"
+              className="p-2 sm:p-2.5 text-mono-400 hover:text-white bg-mono-900 border border-mono-800 rounded-full transition-colors cursor-pointer"
               title="Reload App"
             >
-              <RefreshCw size={16} />
+              <RefreshCw size={15} />
             </button>
             <a
               href={project.githubUrl}
               target="_blank"
               rel="noreferrer"
-              className="p-2.5 text-mono-400 hover:text-white bg-mono-900 border border-mono-800 rounded-full transition-colors cursor-pointer"
+              className="p-2 sm:p-2.5 text-mono-400 hover:text-white bg-mono-900 border border-mono-800 rounded-full transition-colors cursor-pointer"
               title="GitHub Repository"
             >
-              <Github size={16} />
+              <Github size={15} />
             </a>
             <button
               onClick={onClose}
-              className="px-5 py-2 bg-white text-black font-semibold text-xs rounded-full hover:bg-mono-200 transition-all flex items-center gap-1.5 shadow-lg cursor-pointer"
+              className="px-3.5 sm:px-5 py-2 bg-white text-black font-semibold text-xs rounded-full hover:bg-mono-200 transition-all flex items-center gap-1.5 shadow-lg cursor-pointer"
             >
               <X size={14} />
-              <span>Close App</span>
+              <span className="hidden sm:inline">Close App</span>
             </button>
           </div>
         </div>
 
         {/* Expanded Phone Hardware Frame */}
         <motion.div
+          onClick={(e) => e.stopPropagation()}
           initial={{ scale: 0.85, y: 30, opacity: 0 }}
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.85, y: 30, opacity: 0 }}
