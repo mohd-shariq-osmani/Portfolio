@@ -1,24 +1,17 @@
 const MILESTONES = [
   {
-    year: "2024 - Present",
-    role: "Senior AI & Automation Engineer",
-    company: "Self-Directed / Enterprise Advisory",
+    year: "2025 - Present",
+    role: "Automation Engineer & Full Stack Developer",
+    company: "Workflow Automation & Web Engineering",
     description:
-      "Designing end-to-end AI agent frameworks, production n8n workflows, local-first mobile applications, and high-throughput real-time event systems.",
+      "Architecting automated workflow pipelines using n8n, Microsoft Power Automate, and Zoho Flows with webhooks and event-driven triggers. Developing full-stack web applications and custom CRM solutions with Node.js, Next.js, and integrating AI/LLM models for intelligent process automation.",
   },
   {
-    year: "2023 - 2024",
-    role: "Full Stack & Cross-Platform Developer",
-    company: "Mobile & Web Products",
+    year: "2021 - 2025",
+    role: "RPA Automation Developer & QA Engineer",
+    company: "Robotic Process Automation & Quality Assurance",
     description:
-      "Engineered zero-knowledge secure Flutter applications (Vault), task management suites (DailyTask), and Next.js web applications with clean architecture.",
-  },
-  {
-    year: "2022 - 2023",
-    role: "Systems & Integration Specialist",
-    company: "Automation & Infrastructure",
-    description:
-      "Built custom webhook dispatchers, REST API integrations, and continuous deployment automation pipelines across cloud and self-hosted environments.",
+      "Engineered and maintained robotic process automations using UiPath and Blue Prism across enterprise environments. Handled end-to-end process debugging, root-cause failure analysis, production monitoring, and automated test execution to ensure dependable workflow operations.",
   },
 ];
 
@@ -31,10 +24,10 @@ export default function AboutTimeline() {
             Professional Trajectory
           </span>
           <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-1 font-display">
-            Craftsmanship & Philosophy
+            Experience & Engineering Focus
           </h3>
           <p className="text-sm text-mono-300 font-light leading-relaxed mt-3 max-w-2xl">
-            Specializing at the intersection of AI system architecture, autonomous workflow automation, and client-side performance. I believe software should feel instant, secure, and effortless.
+            Specializing in workflow automation, robotic process automation (RPA), and full-stack software development. Dedicated to building reliable, maintainable systems that eliminate manual overhead and improve business operations.
           </p>
         </div>
 

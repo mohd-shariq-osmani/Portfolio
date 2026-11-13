@@ -1,4 +1,4 @@
-import { ArrowUpRight, FileText, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
 
 export default function ContactSection() {
   return (
@@ -37,7 +37,7 @@ export default function ContactSection() {
         </a>
 
         {/* Social Links Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg">
           <a
             href="https://github.com/mohd-shariq-osmani"
             target="_blank"
@@ -50,7 +50,7 @@ export default function ContactSection() {
           </a>
 
           <a
-            href="https://linkedin.com/in/mohd-shariq-osmani"
+            href="https://www.linkedin.com/in/shariq-osmani-14591619a"
             target="_blank"
             rel="noreferrer"
             className="group p-5 bg-mono-950 border border-mono-850 hover:border-mono-600 rounded-2xl transition-all duration-200 flex flex-col items-center gap-2"
@@ -58,17 +58,6 @@ export default function ContactSection() {
             <Linkedin size={22} className="text-mono-400 group-hover:text-white transition-colors" />
             <span className="text-xs font-bold text-white font-display">LinkedIn</span>
             <span className="text-[11px] font-mono text-mono-500">Connect Professionally</span>
-          </a>
-
-          <a
-            href="/resume.pdf"
-            target="_blank"
-            rel="noreferrer"
-            className="group p-5 bg-mono-950 border border-mono-850 hover:border-mono-600 rounded-2xl transition-all duration-200 flex flex-col items-center gap-2"
-          >
-            <FileText size={22} className="text-mono-400 group-hover:text-white transition-colors" />
-            <span className="text-xs font-bold text-white font-display">Resume</span>
-            <span className="text-[11px] font-mono text-mono-500">Download CV PDF</span>
           </a>
         </div>
       </div>
