@@ -21,47 +21,55 @@ export const PROJECTS: Project[] = [
   {
     id: "dailytask",
     title: "DailyTask",
-    tagline: "Intelligent Productivity & Workflow Manager",
+    tagline: "Offline-First Daily Routine & Habit Analytics",
     description:
-      "Actual compiled Flutter Web application running from the official GitHub repository. Features gesture-driven interaction, intelligent task batching, and local-first persistence.",
+      "A distraction-free habit analytics and routine management application built with Flutter. Designed for daily consistency with automated midnight resets, interactive home screen widgets, and detailed completion analytics.",
     githubUrl: "https://github.com/mohd-shariq-osmani/DailyTask",
     demoUrl: "/apps/dailytask/index.html",
     type: "flutter-web",
-    tags: ["Flutter Web", "Dart", "Clean Architecture", "Local-First", "BLoC Pattern"],
+    tags: ["Flutter", "Dart", "Provider", "SQLite", "WidgetKit", "AppWidgets"],
     features: [
-      "Sub-millisecond local storage synchronization",
-      "Gesture-driven task prioritization UI",
-      "Dark mode native UI architecture",
-      "Cross-platform state persistence",
+      "Offline persistence with SQLite (sqflite) and automatic date backfilling",
+      "Interactive iOS (WidgetKit) and Android (AppWidgets) home screen widgets",
+      "13-week consistency heatmap and progress trend charts via CustomPainter",
+      "Daily routine cockpit with auto-reset, task reordering, and streak tracking",
     ],
     caseStudy: {
-      problem: "Traditional task apps suffer from bloated sync latency and complicated interfaces.",
-      solution: "Engineered a streamlined, local-first reactive Flutter application with instant feedback loops.",
-      architecture: "BLoC pattern layered over Hive key-value persistent storage.",
-      impact: "Zero sync delay, sub-60fps rendering across mobile and web targets.",
+      problem:
+        "Many habit trackers require continuous cloud connectivity, introduce interface bloat, and lack quick home screen interactions for fast logging.",
+      solution:
+        "Developed a lightweight, offline-first application combining structured SQLite storage with native home screen widget integration.",
+      architecture:
+        "Provider pattern (ChangeNotifier) with SQLite local storage and native IPC bridges (Darwin Notifications on iOS, Broadcast Receivers on Android).",
+      impact:
+        "Ensures complete offline availability, eliminates network synchronization delays, and provides instant widget-based interaction.",
     },
   },
   {
     id: "vault",
     title: "Vault",
-    tagline: "Zero-Knowledge Personal Secrets & Security Manager",
+    tagline: "Encrypted Local Document & Identity Vault",
     description:
-      "Actual compiled Flutter Web application running from the official GitHub repository. High-security mobile vault engineered with client-side AES-256 encryption.",
+      "A local document security application built with Flutter. Protects sensitive documents, identity cards, and credentials on-device using AES-256-GCM encryption, biometric authentication, and on-device OCR.",
     githubUrl: "https://github.com/mohd-shariq-osmani/Vault",
     demoUrl: "/apps/vault/index.html",
     type: "flutter-web",
-    tags: ["Flutter Web", "Cryptography", "AES-256", "Biometrics", "Security"],
+    tags: ["Flutter", "Riverpod", "AES-256-GCM", "Biometrics", "Google ML Kit", "Offline-First"],
     features: [
-      "Client-side AES-GCM 256-bit encryption",
-      "Biometric hardware security module integration",
-      "Zero telemetry & zero network transmission",
-      "Encrypted backup export & master keys",
+      "AES-256-GCM local encryption for document metadata and attachments",
+      "Hardware-backed key management via Android Keystore and iOS Keychain",
+      "Biometric access control with fingerprint and Face ID authentication",
+      "On-device OCR and form autofill using Google ML Kit text recognition",
     ],
     caseStudy: {
-      problem: "Cloud password managers expose sensitive credentials to third-party server risks.",
-      solution: "Built a zero-trust local vault where decryption keys never leave hardware enclaves.",
-      architecture: "Flutter cryptographic isolates with native Keychain / KeyStore bindings.",
-      impact: "Military-grade credential protection with zero cloud exposure.",
+      problem:
+        "Storing identity cards and sensitive documents in third-party cloud services introduces data breach and privacy risks.",
+      solution:
+        "Engineered an offline-first mobile vault that encrypts all files and records on-device without external network permissions.",
+      architecture:
+        "Riverpod state management paired with the encrypt package (AES-256-GCM), flutter_secure_storage, and local ML Kit processing.",
+      impact:
+        "Provides verifiable data privacy with zero cloud transmission, local biometric gating, and efficient on-device document extraction.",
     },
   },
   {
@@ -69,45 +77,54 @@ export const PROJECTS: Project[] = [
     title: "n8n Companion",
     tagline: "Mobile Workflow Monitoring & Operations Dashboard",
     description:
-      "Actual compiled Flutter Web application running from the official GitHub repository. Dedicated mobile client for self-hosted n8n instances.",
+      "A dedicated Flutter companion app for monitoring and managing self-hosted n8n automation instances. Provides quick access to workflow statuses, execution history logs, and manual test triggers directly from mobile.",
     githubUrl: "https://github.com/mohd-shariq-osmani/n8n-companion",
     demoUrl: "/apps/n8n-companion/index.html",
     type: "flutter-web",
-    tags: ["Flutter Web", "n8n API", "REST / WebSocket", "DevOps", "Automation"],
+    tags: ["Flutter", "Dart", "Provider", "n8n REST API", "Workflow Automation"],
     features: [
-      "Real-time execution status polling & webhooks",
-      "One-tap manual workflow triggering",
-      "Node execution error log viewer",
-      "Multi-instance server management",
+      "Dashboard overview of active and inactive workflows with execution status metrics",
+      "Workflow activation toggles and execution detail inspection",
+      "Manual test execution triggering directly from the mobile interface",
+      "Session authentication with secure local credential caching",
     ],
     caseStudy: {
-      problem: "n8n automation engineers lack a native, high-speed mobile dashboard for on-the-go workflow ops.",
-      solution: "Developed an optimized mobile client tapping into n8n REST API endpoints.",
-      architecture: "Reactive Provider pattern with encrypted API key storage.",
-      impact: "Instant notification & triage for failed automation workflows.",
+      problem:
+        "Monitoring and diagnosing self-hosted n8n workflows typically requires access to a desktop browser, slowing down on-call triage.",
+      solution:
+        "Built a responsive mobile dashboard that communicates directly with n8n REST endpoints to provide real-time status and control.",
+      architecture:
+        "Provider state management consuming n8n REST APIs via HTTP, with session-based authentication and secure local preferences.",
+      impact:
+        "Enables automation engineers to quickly verify execution logs and trigger workflow tests without needing a desktop workstation.",
     },
   },
   {
     id: "relay",
     title: "Relay",
-    tagline: "Real-Time Event Streaming & Webhook Dispatcher",
+    tagline: "Mobile Remote Desktop Input & Peripheral Controller",
     description:
-      "An automated event bridge and payload processing system connecting distributed microservices, webhooks, and AI pipelines seamlessly.",
+      "A cross-platform input controller system that turns mobile devices into a low-latency virtual trackpad, keyboard, and clipboard synchronization tool for desktop computers (macOS and Windows) over local Wi-Fi.",
     githubUrl: "https://github.com/mohd-shariq-osmani/Relay",
+    demoUrl: undefined,
     type: "video",
     videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-code-running-on-a-computer-screen-23580-large.mp4",
-    tags: ["Node.js", "Webhooks", "Event-Driven", "AI Pipelines", "System Architecture"],
+    tags: ["Flutter", "Python", "WebSockets", "asyncio", "mDNS / Zeroconf", "Cross-Platform"],
     features: [
-      "High-throughput webhook queueing & retries",
-      "Dynamic payload transformation engine",
-      "Monochrome live traffic visualizer",
-      "Integrated error dead-letter queue",
+      "Virtual trackpad with smooth cursor movement, tap-to-click, and two-finger scroll",
+      "Remote keyboard input with real-time text transmission and modifier key support",
+      "Automatic local network discovery via mDNS / Zeroconf with secure PIN pairing",
+      "Bi-directional clipboard synchronization and desktop power controls (sleep and lock)",
     ],
     caseStudy: {
-      problem: "Unreliable third-party webhooks drop critical events during traffic bursts.",
-      solution: "Created an event buffer and queue dispatcher with automatic exponential backoff retries.",
-      architecture: "Event-driven asynchronous message router.",
-      impact: "99.99% event delivery reliability across microservice integrations.",
+      problem:
+        "Controlling desktop media, presentations, or input devices remotely often requires specialized hardware or cloud-dependent apps that introduce latency and security concerns.",
+      solution:
+        "Designed a local-first client-server system communicating directly over local Wi-Fi via WebSockets with zero cloud dependencies.",
+      architecture:
+        "Python 3.11 asyncio desktop server handling OS-level inputs, paired with a Flutter client utilizing mDNS discovery and persistent WebSocket channels.",
+      impact:
+        "Delivers responsive, low-latency desktop control completely within the local network with automated pairing and zero telemetry.",
     },
   },
 ];

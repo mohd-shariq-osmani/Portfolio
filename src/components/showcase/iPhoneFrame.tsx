@@ -15,10 +15,29 @@ interface IPhoneFrameProps {
 
 export default function IPhoneFrame({ project, onLaunchBuildLab }: IPhoneFrameProps) {
   const [iframeKey, setIframeKey] = useState(0);
-  const [useFallback, setUseFallback] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // Default to fast, lightweight React simulator to avoid heavy WebGL/WASM memory pressure on mobile WebKit
+  const [useFallback, setUseFallback] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Auto-detect mobile touch devices: default to the lightweight, native-feeling
+  // React simulator to avoid loading heavy 30MB+ WebGL/WASM runtimes that throttle iOS WebKit
+  useEffect(() => {
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 768 ||
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0);
+    if (isMobile) {
+      setUseFallback(true);
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
+    if (useFallback) {
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     // Timeout safety guard: if iframe takes > 2s to load, switch to responsive simulator
     const timer = setTimeout(() => {

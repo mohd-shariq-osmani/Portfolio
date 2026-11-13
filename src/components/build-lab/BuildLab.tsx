@@ -62,8 +62,9 @@ export default function BuildLab({ onLaunch }: BuildLabProps) {
 
               {/* Action Button */}
               <button
+                type="button"
                 onClick={() => onLaunch(project)}
-                className="w-full sm:w-auto px-6 py-2.5 bg-white text-black font-semibold text-xs rounded-full hover:bg-mono-200 transition-all duration-200 flex items-center justify-center gap-2 group-hover:scale-105 shrink-0"
+                className="w-full sm:w-auto px-6 py-2.5 bg-white text-black font-semibold text-xs rounded-full hover:bg-mono-200 transition-all duration-200 flex items-center justify-center gap-2 group-hover:scale-105 shrink-0 cursor-pointer select-none"
               >
                 <Play size={13} className="fill-black" />
                 <span>

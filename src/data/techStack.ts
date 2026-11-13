@@ -9,37 +9,103 @@ export interface TechCategory {
 
 export const TECH_STACK: TechCategory[] = [
   {
-    category: "AI & Intelligent Automation",
+    category: "Workflow Automation & AI Systems",
     skills: [
-      { name: "n8n Workflow Automation", level: "Expert", description: "Custom node creation, complex webhooks, autonomous agent loops." },
-      { name: "AI Agents & LLM Integration", level: "Advanced", description: "Function calling, RAG pipelines, Gemini API, structured outputs." },
-      { name: "Python & Data Processing", level: "Advanced", description: "Asynchronous backend logic, vector embeddings, scraping." },
-      { name: "Vector Databases", level: "Proficient", description: "Qdrant, Pinecone, semantic search indexing." },
+      {
+        name: "n8n Workflow Orchestration",
+        level: "Advanced",
+        description: "Designing multi-node automation pipelines, webhook handlers, and AI agent chains.",
+      },
+      {
+        name: "Power Automate & Zoho Flows",
+        level: "Advanced",
+        description: "Connecting business applications through cloud flows, scheduled triggers, and automated event actions.",
+      },
+      {
+        name: "Webhooks & Event Triggers",
+        level: "Advanced",
+        description: "Configuring asynchronous HTTP webhook endpoints, payload parsers, and event dispatchers.",
+      },
+      {
+        name: "AI & LLM Integration",
+        level: "Advanced",
+        description: "Integrating language models via structured outputs, function calling, and contextual prompt design.",
+      },
     ],
   },
   {
-    category: "Cross-Platform & Mobile Engineering",
+    category: "Robotic Process Automation (RPA)",
     skills: [
-      { name: "Flutter & Dart", level: "Expert", description: "Clean Architecture, BLoC pattern, custom platform channels, Flutter Web." },
-      { name: "Native Enclave & Biometrics", level: "Advanced", description: "Keychain/KeyStore integration, AES-256 local security." },
-      { name: "Local-First Storage", level: "Expert", description: "Hive, SQLite, sub-millisecond offline sync architecture." },
+      {
+        name: "UiPath & Blue Prism",
+        level: "Advanced",
+        description: "Developing automated desktop and web processes, selectors, and background queue workers.",
+      },
+      {
+        name: "Process Debugging & Analysis",
+        level: "Advanced",
+        description: "Root-cause fault isolation, runtime variable inspection, and exception recovery logic.",
+      },
+      {
+        name: "Production Monitoring",
+        level: "Advanced",
+        description: "Active process surveillance, automated error logging, and execution audit reporting.",
+      },
+      {
+        name: "Test Automation & QA",
+        level: "Advanced",
+        description: "Automated regression testing, edge case scenario validation, and quality verification.",
+      },
     ],
   },
   {
     category: "Full Stack & Web Architecture",
     skills: [
-      { name: "Next.js & React", level: "Expert", description: "App Router, SSR, Server Actions, performance optimization." },
-      { name: "TypeScript", level: "Expert", description: "Strict typing, generics, complex domain modeling." },
-      { name: "Tailwind CSS & Motion", level: "Expert", description: "Framer Motion, GSAP ScrollTrigger, Lenis smooth scroll, custom CSS engines." },
-      { name: "Node.js & Express", level: "Advanced", description: "REST APIs, WebSocket streaming, asynchronous queues." },
+      {
+        name: "Node.js & Backend Services",
+        level: "Advanced",
+        description: "Developing RESTful APIs, asynchronous services, and modular server-side logic.",
+      },
+      {
+        name: "Custom CRM & Systems Integration",
+        level: "Advanced",
+        description: "Building tailored CRM platforms, third-party API bridges, and customer data pipelines.",
+      },
+      {
+        name: "Next.js & React",
+        level: "Advanced",
+        description: "Building responsive, component-driven user interfaces with App Router and server-rendered pages.",
+      },
+      {
+        name: "TypeScript",
+        level: "Advanced",
+        description: "Enforcing type safety, structured domain models, and maintainable application codebases.",
+      },
     ],
   },
   {
-    category: "Infrastructure & Systems",
+    category: "Mobile & Systems Engineering",
     skills: [
-      { name: "Docker & Containerization", level: "Advanced", description: "Multi-stage builds, self-hosted service orchestration." },
-      { name: "Git & CI/CD", level: "Expert", description: "GitHub Actions, automated test suites, release pipelines." },
-      { name: "Linux Systems & CLI", level: "Advanced", description: "Shell scripting, server management, security hardening." },
+      {
+        name: "Flutter & Dart",
+        level: "Advanced",
+        description: "Cross-platform mobile development using Provider and Riverpod state management patterns.",
+      },
+      {
+        name: "Offline Storage & Persistence",
+        level: "Advanced",
+        description: "Local data modeling using SQLite (sqflite) and platform-level preference stores.",
+      },
+      {
+        name: "Local Security & Biometrics",
+        level: "Advanced",
+        description: "Client-side AES-256-GCM encryption, biometric authentication, and Keychain/Keystore integration.",
+      },
+      {
+        name: "Git & CI/CD Automation",
+        level: "Advanced",
+        description: "Automated GitHub Actions build checks, branch lifecycle management, and release staging.",
+      },
     ],
   },
 ];

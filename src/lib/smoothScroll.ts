@@ -17,6 +17,8 @@ export function scrollToTarget(target: string, offset = -88) {
     return;
   }
 
+  // Native smooth scroll for mobile & touch devices using native scrollIntoView
+  // which honors scroll-padding-top: 96px defined in html
   element.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
