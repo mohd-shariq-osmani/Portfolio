@@ -7,7 +7,7 @@ export default function TechGrid() {
         {TECH_STACK.map((cat) => (
           <div
             key={cat.category}
-            className="p-6 bg-mono-950/80 border border-mono-850 hover:border-mono-700 rounded-2xl transition-all duration-300 backdrop-blur-md group"
+            className="p-6 bg-mono-950 sm:bg-mono-950/80 border border-mono-850 hover:border-mono-700 rounded-2xl transition-all duration-300 sm:backdrop-blur-md group"
           >
             <h4 className="text-xs font-mono uppercase tracking-wider text-mono-400 mb-4 pb-2 border-b border-mono-900 flex items-center justify-between">
               <span>{cat.category}</span>

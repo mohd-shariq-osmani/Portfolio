@@ -10,7 +10,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="w-full py-8 px-4 sm:px-8 bg-black text-mono-400 border-t border-mono-900 text-xs font-mono">
+    <footer className="w-full pt-8 pb-[max(2rem,env(safe-area-inset-bottom))] px-4 sm:px-8 bg-black text-mono-400 border-t border-mono-900 text-xs font-mono">
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Left */}
         <div className="flex items-center gap-2.5">

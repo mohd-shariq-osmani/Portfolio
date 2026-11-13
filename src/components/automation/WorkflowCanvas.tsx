@@ -190,6 +190,8 @@ export default function WorkflowCanvas() {
             return (
               <div
                 key={node.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelectedNodeId(node.id)}
                 style={{
                   left: `${node.x}px`,

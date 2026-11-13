@@ -16,13 +16,26 @@ interface AppLauncherModalProps {
 
 export default function AppLauncherModal({ project, onClose }: AppLauncherModalProps) {
   const [resetKey, setResetKey] = useState(0);
-  const [useFallback, setUseFallback] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [useFallback, setUseFallback] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!project) return;
-    setIsLoading(true);
-    setUseFallback(false);
+
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 768 ||
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0);
+
+    // On mobile touch devices, default to instant lightweight simulator to avoid heavy WebGL/WASM memory crashes
+    if (isMobile || project.type !== "flutter-web") {
+      setUseFallback(true);
+      setIsLoading(false);
+    } else {
+      setUseFallback(false);
+      setIsLoading(true);
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -72,7 +85,7 @@ export default function AppLauncherModal({ project, onClose }: AppLauncherModalP
         {/* Header Bar */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between z-30"
+          className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between z-30 pt-[env(safe-area-inset-top)]"
         >
           <div className="flex items-center gap-2.5 sm:gap-3">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-mono-900 border border-mono-700 flex items-center justify-center text-white shrink-0">
@@ -91,8 +104,14 @@ export default function AppLauncherModal({ project, onClose }: AppLauncherModalP
           <div className="flex items-center gap-2 sm:gap-3">
             {project.type === "flutter-web" && (
               <button
-                onClick={() => setUseFallback(!useFallback)}
-                className="hidden sm:inline-flex px-3 py-1.5 text-mono-300 hover:text-white bg-mono-900 border border-mono-800 rounded-full text-xs font-mono transition-colors"
+                onClick={() => {
+                  const nextState = !useFallback;
+                  setUseFallback(nextState);
+                  if (!nextState) {
+                    setIsLoading(true);
+                  }
+                }}
+                className="inline-flex px-3 py-1.5 text-mono-300 hover:text-white bg-mono-900 border border-mono-800 rounded-full text-xs font-mono transition-colors"
               >
                 {useFallback ? "Switch to Web" : "Switch to Sim"}
               </button>
@@ -134,7 +153,7 @@ export default function AppLauncherModal({ project, onClose }: AppLauncherModalP
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.85, y: 30, opacity: 0 }}
           transition={{ type: "spring", stiffness: 350, damping: 30 }}
-          className="relative w-full max-w-[390px] sm:max-w-[430px] h-[82vh] max-h-[820px] bg-mono-950 border-[12px] border-mono-800 rounded-[56px] shadow-2xl shadow-black p-3 flex flex-col items-center justify-between"
+          className="relative w-full max-w-[390px] sm:max-w-[430px] h-[82dvh] max-h-[calc(100dvh-5rem)] sm:h-[82vh] sm:max-h-[820px] bg-mono-950 border-[12px] border-mono-800 rounded-[56px] shadow-2xl shadow-black p-3 flex flex-col items-center justify-between"
         >
           {/* Dynamic Island Notch */}
           <div className="absolute top-5 z-30 w-28 h-6 bg-black rounded-full flex items-center justify-end px-3 gap-2 border border-mono-850">
