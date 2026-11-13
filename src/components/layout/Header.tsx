@@ -41,7 +41,7 @@ export default function Header() {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -130,15 +130,17 @@ export default function Header() {
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.label}
+                type="button"
                 onClick={() => scrollToSection(item.href)}
-                className="text-left text-sm font-medium tracking-wider uppercase py-2 text-mono-300 hover:text-white border-b border-mono-900 last:border-0 cursor-pointer"
+                className="text-left text-sm font-medium tracking-wider uppercase py-2 text-mono-300 hover:text-white border-b border-mono-900 last:border-0 cursor-pointer select-none"
               >
                 {item.label}
               </button>
             ))}
             <button
+              type="button"
               onClick={() => scrollToSection("#contact")}
-              className="w-full mt-2 py-3 text-xs font-semibold tracking-wider text-black bg-white rounded-xl text-center uppercase cursor-pointer"
+              className="w-full mt-2 py-3 text-xs font-semibold tracking-wider text-black bg-white rounded-xl text-center uppercase cursor-pointer select-none"
             >
               Get in Touch
             </button>

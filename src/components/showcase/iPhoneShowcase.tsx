@@ -34,8 +34,9 @@ export default function IPhoneShowcase({ onLaunchBuildLab }: iPhoneShowcaseProps
             {PROJECTS.map((proj) => (
               <button
                 key={proj.id}
+                type="button"
                 onClick={() => setActiveTab(proj.id)}
-                className={`px-4 py-2 text-xs font-medium rounded-full transition-all duration-200 ${
+                className={`px-4 py-2 text-xs font-medium rounded-full transition-all duration-200 cursor-pointer select-none ${
                   activeTab === proj.id
                     ? "bg-white text-black font-semibold shadow-md"
                     : "text-mono-400 hover:text-white"
