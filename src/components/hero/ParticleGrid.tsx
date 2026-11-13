@@ -30,18 +30,20 @@ export default function ParticleGrid() {
 
     let particles: Particle[] = [];
     const mouse = { x: -2000, y: -2000, targetX: -2000, targetY: -2000 };
-    let isVisible = true;
+
+    let lastWidth = typeof window !== "undefined" ? window.innerWidth : 0;
+    let cachedRect: DOMRect | null = null;
 
     const setupCanvas = () => {
-      const rect = canvas.getBoundingClientRect();
-      width = Math.floor(rect.width || window.innerWidth);
-      height = Math.floor(rect.height || window.innerHeight);
+      cachedRect = canvas.getBoundingClientRect();
+      width = Math.floor(canvas.clientWidth || cachedRect.width || window.innerWidth);
+      height = Math.floor(canvas.clientHeight || cachedRect.height || window.innerHeight);
       const isMobile = width < 768;
       // On mobile screens, DPR 1 cuts pixel rendering overhead by 4x on iOS WebKit
       dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
 
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
 
@@ -56,7 +58,7 @@ export default function ParticleGrid() {
       const isMobile = width < 768;
       // Streamlined count on mobile for silky smooth 60/120fps
       const count = isMobile
-        ? Math.min(26, Math.max(18, Math.floor((width * height) / 22000)))
+        ? Math.min(24, Math.max(16, Math.floor((width * height) / 24000)))
         : Math.min(Math.max(50, Math.floor((width * height) / 14000)), 90);
 
       for (let i = 0; i < count; i++) {
@@ -79,9 +81,9 @@ export default function ParticleGrid() {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.targetX = e.clientX - rect.left;
-      mouse.targetY = e.clientY - rect.top;
+      if (!cachedRect) cachedRect = canvas.getBoundingClientRect();
+      mouse.targetX = e.clientX - cachedRect.left;
+      mouse.targetY = e.clientY - cachedRect.top;
     };
 
     const handleMouseLeave = () => {
@@ -89,8 +91,28 @@ export default function ParticleGrid() {
       mouse.targetY = -2000;
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        if (!cachedRect) cachedRect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        mouse.targetX = touch.clientX - cachedRect.left;
+        mouse.targetY = touch.clientY - cachedRect.top;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      mouse.targetX = -2000;
+      mouse.targetY = -2000;
+    };
+
     const handleResize = () => {
-      setupCanvas();
+      const currentWidth = window.innerWidth;
+      // On iOS Safari, scrolling dynamic address bar triggers vertical resize events.
+      // We ONLY reconfigure the canvas if the viewport width changes significantly.
+      if (Math.abs(currentWidth - lastWidth) > 15) {
+        lastWidth = currentWidth;
+        setupCanvas();
+      }
     };
 
     const drawScene = () => {
@@ -98,11 +120,11 @@ export default function ParticleGrid() {
       ctx.clearRect(0, 0, width, height);
 
       const isMobile = width < 768;
-      const maxConnectDist = isMobile ? 100 : 135;
+      const maxConnectDist = isMobile ? 95 : 135;
       const maxConnectDistSq = maxConnectDist * maxConnectDist;
-      const mouseRadius = isMobile ? 130 : 180;
+      const mouseRadius = isMobile ? 120 : 180;
 
-      // Smooth cursor lerp
+      // Smooth cursor / touch lerp
       mouse.x += (mouse.targetX - mouse.x) * 0.1;
       mouse.y += (mouse.targetY - mouse.y) * 0.1;
 
@@ -122,18 +144,20 @@ export default function ParticleGrid() {
         if (p.y < -15) p.y = height + 15;
         else if (p.y > height + 15) p.y = -15;
 
-        // Cursor deflection & illumination
-        const dxMouse = mouse.x - p.x;
-        const dyMouse = mouse.y - p.y;
-        const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+        // Cursor deflection & illumination (skip if offscreen)
+        if (mouse.x > 0 && mouse.y > 0) {
+          const dxMouse = mouse.x - p.x;
+          const dyMouse = mouse.y - p.y;
+          const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
 
-        if (distMouse < mouseRadius && distMouse > 0) {
-          const force = (1 - distMouse / mouseRadius) * 0.45;
-          p.x -= (dxMouse / distMouse) * force;
-          p.y -= (dyMouse / distMouse) * force;
-          p.alpha = Math.min(p.baseAlpha + (1 - distMouse / mouseRadius) * 0.5, 0.95);
-        } else {
-          p.alpha += (p.baseAlpha - p.alpha) * 0.05;
+          if (distMouse < mouseRadius && distMouse > 0) {
+            const force = (1 - distMouse / mouseRadius) * 0.45;
+            p.x -= (dxMouse / distMouse) * force;
+            p.y -= (dyMouse / distMouse) * force;
+            p.alpha = Math.min(p.baseAlpha + (1 - distMouse / mouseRadius) * 0.5, 0.95);
+          } else {
+            p.alpha += (p.baseAlpha - p.alpha) * 0.05;
+          }
         }
 
         // Draw particle
@@ -145,8 +169,10 @@ export default function ParticleGrid() {
         ctx.fill();
       }
 
-      // 2. Draw connecting network lines
+      // 2. Draw connecting network lines - batched in single draw call for high-performance rendering on mobile WebKit
+      ctx.beginPath();
       ctx.lineWidth = 0.75;
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.14)";
       for (let i = 0; i < len; i++) {
         const p1 = particles[i];
         for (let j = i + 1; j < len; j++) {
@@ -156,62 +182,66 @@ export default function ParticleGrid() {
           const distSq = dx * dx + dy * dy;
 
           if (distSq < maxConnectDistSq) {
-            const dist = Math.sqrt(distSq);
-            // Clearly visible yet elegant lines
-            const lineAlpha = (1 - dist / maxConnectDist) * 0.22;
-            ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`;
-            ctx.stroke();
           }
         }
+      }
+      ctx.stroke();
 
-        // Connecting line to cursor if nearby
-        if (mouse.x > 0 && mouse.y > 0) {
+      // Connecting line to cursor / touch if active
+      if (mouse.x > 0 && mouse.y > 0) {
+        ctx.beginPath();
+        ctx.lineWidth = 0.75;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
+        for (let i = 0; i < len; i++) {
+          const p1 = particles[i];
           const dxM = p1.x - mouse.x;
           const dyM = p1.y - mouse.y;
           const distMSq = dxM * dxM + dyM * dyM;
           if (distMSq < mouseRadius * mouseRadius) {
-            const distM = Math.sqrt(distMSq);
-            const mouseLineAlpha = (1 - distM / mouseRadius) * 0.25;
-            ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${mouseLineAlpha})`;
-            ctx.stroke();
           }
         }
+        ctx.stroke();
       }
     };
 
     const loop = () => {
-      if (isVisible) {
+      // Direct viewport check: instantly animates on mount and pauses only when scrolled far past hero
+      const inView = typeof window !== "undefined" ? window.scrollY < (height || window.innerHeight) * 1.3 : true;
+      if (inView) {
         drawScene();
       }
       animationFrameId = requestAnimationFrame(loop);
     };
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        animationFrameId = requestAnimationFrame(loop);
+      }
+    };
+
     setupCanvas();
     animationFrameId = requestAnimationFrame(loop);
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisible = entry.isIntersecting;
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(canvas);
 
     window.addEventListener("resize", handleResize);
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     window.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      observer.disconnect();
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);

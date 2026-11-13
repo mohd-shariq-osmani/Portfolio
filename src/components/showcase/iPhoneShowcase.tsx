@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { PROJECTS, Project } from "@/data/projects";
 import IPhoneFrame from "./iPhoneFrame";
 import { ArrowUpRight, CheckCircle2, Github, Layers, Play } from "lucide-react";
@@ -53,12 +52,9 @@ export default function IPhoneShowcase({ onLaunchBuildLab }: iPhoneShowcaseProps
           if (project.id !== activeTab) return null;
 
           return (
-            <motion.div
+            <div
               key={project.id}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-mono-950/80 border border-mono-850 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl"
+              className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-mono-950 sm:bg-mono-950/80 border border-mono-850 rounded-3xl p-6 sm:p-10 shadow-2xl sm:backdrop-blur-xl transition-all duration-300"
             >
               {/* Left Column: Project Details & Case Study */}
               <div className="lg:col-span-7 flex flex-col justify-center gap-6">
@@ -141,7 +137,7 @@ export default function IPhoneShowcase({ onLaunchBuildLab }: iPhoneShowcaseProps
               <div className="lg:col-span-5 flex justify-center items-center">
                 <IPhoneFrame project={project} onLaunchBuildLab={onLaunchBuildLab} />
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>

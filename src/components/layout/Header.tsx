@@ -21,23 +21,28 @@ export default function Header() {
   const [activeSection, setActiveSection] = useState("hero");
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 40) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+    let ticking = false;
 
-      const sections = NAV_ITEMS.map((item) => item.href.substring(1));
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 250 && rect.bottom >= 250) {
-            setActiveSection(section);
-            break;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const isScrolled = window.scrollY > 40;
+          setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
+
+          const sections = NAV_ITEMS.map((item) => item.href.substring(1));
+          for (const section of sections) {
+            const el = document.getElementById(section);
+            if (el) {
+              const rect = el.getBoundingClientRect();
+              if (rect.top <= 250 && rect.bottom >= 250) {
+                setActiveSection((prev) => (prev !== section ? section : prev));
+                break;
+              }
+            }
           }
-        }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
@@ -52,7 +57,7 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-4 sm:pt-6">
+    <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:pt-6">
       <nav
         className={`flex items-center justify-between px-4 sm:px-6 py-2.5 rounded-full border transition-all duration-300 backdrop-blur-md ${
           scrolled
