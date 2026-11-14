@@ -21,9 +21,8 @@ const nextConfig = {
         ],
       },
       {
-        source: "/:path*flutter_service_worker.js",
+        source: "/:path*(flutter_service_worker.js)",
         headers: [
-          { key: "Clear-Site-Data", value: '"cache", "storage"' },
           { key: "Cache-Control", value: "no-store, no-cache, must-revalidate" },
         ],
       },

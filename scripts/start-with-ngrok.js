@@ -12,7 +12,7 @@ async function main() {
   // 1. Start Next.js server on port 4000
   const nextDev = spawn(
     process.execPath,
-    ["node_modules/next/dist/bin/next", "dev", "-p", String(PORT)],
+    ["node_modules/next/dist/bin/next", "dev", "-H", "0.0.0.0", "-p", String(PORT)],
     {
       stdio: "inherit",
       env: { ...process.env },
