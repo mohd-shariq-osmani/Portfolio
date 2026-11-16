@@ -3,6 +3,7 @@
 import ParticleGrid from "./ParticleGrid";
 import { ArrowDown, Play } from "lucide-react";
 import { scrollToTarget } from "@/lib/smoothScroll";
+import CatMascot from "@/components/mascot/CatMascot";
 
 export default function Hero() {
   const scrollToSection = (id: string) => {
@@ -59,9 +60,14 @@ export default function Hero() {
         </div>
 
         {/* Subtitle Statement */}
-        <p className="text-sm sm:text-lg md:text-xl text-mono-300 max-w-2xl font-light leading-relaxed mb-8 sm:mb-10 text-balance px-2 animate-hero-subtitle">
+        <p className="text-sm sm:text-lg md:text-xl text-mono-300 max-w-2xl font-light leading-relaxed mb-6 sm:mb-10 text-balance px-2 animate-hero-subtitle">
           I build AI-powered software, intelligent automation systems, and cross-platform mobile applications.
         </p>
+
+        {/* Mobile Pixel Cat Mascot Companion (intentionally placed directly below hero introduction) */}
+        <div className="md:hidden mb-6 flex justify-center w-full">
+          <CatMascot variant="hero" />
+        </div>
 
         {/* CTA Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-3.5 sm:gap-4 w-full sm:w-auto animate-hero-cta">

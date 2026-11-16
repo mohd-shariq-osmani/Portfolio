@@ -4,6 +4,8 @@ import "./globals.css";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import ServiceWorkerCleanup from "@/components/utils/ServiceWorkerCleanup";
+import CatMascot from "@/components/mascot/CatMascot";
 
 export const viewport: Viewport = {
   themeColor: "#000000",
@@ -86,33 +88,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} dark`}>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(regs) {
-                  for (var i = 0; i < regs.length; i++) {
-                    regs[i].unregister();
-                  }
-                });
-                if (window.caches) {
-                  caches.keys().then(function(keys) {
-                    for (var i = 0; i < keys.length; i++) {
-                      caches.delete(keys[i]);
-                    }
-                  });
-                }
-              }
-            `,
-          }}
-        />
-      </head>
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black">
+        <ServiceWorkerCleanup />
         <SmoothScroll>
           <Header />
           <main className="w-full flex flex-col min-h-screen">{children}</main>
           <Footer />
+          <CatMascot variant="floating" />
         </SmoothScroll>
       </body>
     </html>

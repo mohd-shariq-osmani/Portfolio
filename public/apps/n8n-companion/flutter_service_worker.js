@@ -9,8 +9,6 @@ self.addEventListener('activate', (event) => {
     (async () => {
       try {
         await self.registration.unregister();
-        const keys = await caches.keys();
-        await Promise.all(keys.map((k) => caches.delete(k)));
       } catch (e) {
         console.warn('Failed to unregister the service worker:', e);
       }
