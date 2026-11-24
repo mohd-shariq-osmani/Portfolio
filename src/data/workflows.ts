@@ -2,10 +2,12 @@ export interface WorkflowNode {
   id: string;
   name: string;
   subtitle?: string;
+  detail?: string;
+  branch?: string;
   type: "trigger" | "action" | "ai" | "database" | "router" | "subnode";
   icon: string;
-  x: number; // pixel X coordinate on 1200x500 canvas
-  y: number; // pixel Y coordinate on 1200x500 canvas
+  x: number;
+  y: number;
 }
 
 export interface WorkflowConnection {
@@ -13,10 +15,19 @@ export interface WorkflowConnection {
   to: string;
 }
 
+export interface WorkflowRoute {
+  id: string;
+  label: string;
+}
+
 export interface Workflow {
   id: string;
   name: string;
+  shortLabel: string;
   description: string;
+  canvasWidth: number;
+  canvasHeight: number;
+  routes?: WorkflowRoute[];
   nodes: WorkflowNode[];
   connections: WorkflowConnection[];
 }
@@ -24,47 +35,308 @@ export interface Workflow {
 export const REAL_N8N_WORKFLOW: Workflow = {
   id: "discord-ai-router",
   name: "Discord AI Content Router & Multi-Platform Dispatcher",
+  shortLabel: "Discord AI Router",
   description:
     "Production n8n pipeline ingesting Discord messages, extracting links, reasoning via LLM Chain, and routing posts across Instagram & Discord channels.",
+  canvasWidth: 2740,
+  canvasHeight: 640,
+  routes: [
+    { id: "p1", label: "P1: Project" },
+    { id: "p2", label: "P2: Workout" },
+    { id: "p3", label: "P3: Media" },
+  ],
   nodes: [
-    { id: "n1", name: "Every 5 Minutes", subtitle: "Cron Trigger", type: "trigger", icon: "Clock", x: 120, y: 320 },
-    { id: "n2", name: "Get Discord Messages", subtitle: "discord message", type: "action", icon: "MessageSquare", x: 300, y: 320 },
-    { id: "n3", name: "De-dupe Messages", subtitle: "EVENT/Message", type: "action", icon: "Filter", x: 500, y: 320 },
-    { id: "n4", name: "Extract URLs", subtitle: "Regex Match", type: "action", icon: "Link", x: 680, y: 320 },
-    { id: "n5", name: "Parse Router", subtitle: "JSON Parser", type: "action", icon: "Code", x: 860, y: 320 },
-    
-    // Main LLM Reasoning Core
-    { id: "n6", name: "Basic LLM Chain", subtitle: "Main Reasoner", type: "ai", icon: "Cpu", x: 1040, y: 320 },
-    { id: "n6_sub", name: "OpenRouter Chat Model", subtitle: "Gemini 1.5 Pro", type: "subnode", icon: "Bot", x: 1040, y: 510 },
-    
-    { id: "n7", name: "Parse Router Output", subtitle: "JSON Struct", type: "action", icon: "Code", x: 1220, y: 320 },
-    
-    // Router / Switch Node
-    { id: "n8", name: "Router / SWITCH", subtitle: "mode: Rules", type: "router", icon: "GitBranch", x: 1400, y: 320 },
-
+    {
+      id: "n1",
+      name: "Every 5 Minutes",
+      subtitle: "Cron Trigger",
+      detail: "Polls configured channels on a 5-minute schedule to capture new submissions.",
+      type: "trigger",
+      icon: "Clock",
+      x: 120,
+      y: 320,
+    },
+    {
+      id: "n2",
+      name: "Get Discord Messages",
+      subtitle: "discord message",
+      detail: "Fetches recent channel messages via Discord REST API with cursor state.",
+      type: "action",
+      icon: "MessageSquare",
+      x: 300,
+      y: 320,
+    },
+    {
+      id: "n3",
+      name: "De-dupe Messages",
+      subtitle: "EVENT/Message",
+      detail: "Filters out previously processed message IDs to preserve idempotency.",
+      type: "action",
+      icon: "Filter",
+      x: 500,
+      y: 320,
+    },
+    {
+      id: "n4",
+      name: "Extract URLs",
+      subtitle: "Regex Match",
+      detail: "Parses embedded URLs and metadata tokens from incoming message payloads.",
+      type: "action",
+      icon: "Link",
+      x: 680,
+      y: 320,
+    },
+    {
+      id: "n5",
+      name: "Parse Router",
+      subtitle: "JSON Parser",
+      detail: "Normalizes message content and URL context for downstream LLM classification.",
+      type: "action",
+      icon: "Code",
+      x: 860,
+      y: 320,
+    },
+    {
+      id: "n6",
+      name: "Basic LLM Chain",
+      subtitle: "Main Reasoner",
+      detail: "Classifies content category and chooses destination route (P1, P2, or P3).",
+      type: "ai",
+      icon: "Cpu",
+      x: 1040,
+      y: 320,
+    },
+    {
+      id: "n6_sub",
+      name: "OpenRouter Chat Model",
+      subtitle: "Gemini 1.5 Pro",
+      detail: "Sub-node providing structured chat completions to the main LLM Chain.",
+      type: "subnode",
+      icon: "Bot",
+      x: 1040,
+      y: 510,
+    },
+    {
+      id: "n7",
+      name: "Parse Router Output",
+      subtitle: "JSON Struct",
+      detail: "Validates strict JSON schema returned by the LLM before branching.",
+      type: "action",
+      icon: "Code",
+      x: 1220,
+      y: 320,
+    },
+    {
+      id: "n8",
+      name: "Router / SWITCH",
+      subtitle: "mode: Rules",
+      detail: "Routes items into Project, Workout, or Media formatting pipelines.",
+      type: "router",
+      icon: "GitBranch",
+      x: 1400,
+      y: 320,
+    },
     // Branch P1 (Project)
-    { id: "p1", name: "P1", subtitle: "Condition", type: "action", icon: "Check", x: 1580, y: 150 },
-    { id: "p1_http", name: "HTTP Request", subtitle: "Instagram API 1", type: "action", icon: "Globe", x: 1770, y: 150 },
-    { id: "p1_llm", name: "Basic LLM Chain", subtitle: "Project LLM", type: "ai", icon: "Cpu", x: 1960, y: 150 },
-    { id: "p1_parse", name: "Parse Project", subtitle: "JSON", type: "action", icon: "Code", x: 2150, y: 150 },
-    { id: "p1_limit", name: "Limit Project Length", subtitle: "Truncate", type: "action", icon: "Sliders", x: 2340, y: 150 },
-    { id: "p1_out", name: "Create Project Post", subtitle: "Discord Send", type: "action", icon: "Send", x: 2530, y: 150 },
-
+    {
+      id: "p1",
+      name: "P1",
+      subtitle: "Condition",
+      detail: "Matches items tagged as software or engineering project updates.",
+      branch: "p1",
+      type: "action",
+      icon: "Check",
+      x: 1580,
+      y: 150,
+    },
+    {
+      id: "p1_http",
+      name: "HTTP Request",
+      subtitle: "Instagram API 1",
+      detail: "Fetches media metadata or publishes project preview asset.",
+      branch: "p1",
+      type: "action",
+      icon: "Globe",
+      x: 1770,
+      y: 150,
+    },
+    {
+      id: "p1_llm",
+      name: "Basic LLM Chain",
+      subtitle: "Project LLM",
+      detail: "Generates a concise technical caption tailored for project announcements.",
+      branch: "p1",
+      type: "ai",
+      icon: "Cpu",
+      x: 1960,
+      y: 150,
+    },
+    {
+      id: "p1_parse",
+      name: "Parse Project",
+      subtitle: "JSON",
+      detail: "Extracts title, summary, and tag fields from generated copy.",
+      branch: "p1",
+      type: "action",
+      icon: "Code",
+      x: 2150,
+      y: 150,
+    },
+    {
+      id: "p1_limit",
+      name: "Limit Project Length",
+      subtitle: "Truncate",
+      detail: "Enforces Discord message character limits before final dispatch.",
+      branch: "p1",
+      type: "action",
+      icon: "Sliders",
+      x: 2340,
+      y: 150,
+    },
+    {
+      id: "p1_out",
+      name: "Create Project Post",
+      subtitle: "Discord Send",
+      detail: "Publishes the formatted project summary to the target Discord channel.",
+      branch: "p1",
+      type: "action",
+      icon: "Send",
+      x: 2530,
+      y: 150,
+    },
     // Branch P2 (Workout)
-    { id: "p2", name: "P2", subtitle: "Condition", type: "action", icon: "Check", x: 1580, y: 320 },
-    { id: "p2_http", name: "HTTP Request", subtitle: "Instagram API 2", type: "action", icon: "Globe", x: 1770, y: 320 },
-    { id: "p2_llm", name: "Basic LLM Chain", subtitle: "Workout LLM", type: "ai", icon: "Cpu", x: 1960, y: 320 },
-    { id: "p2_parse", name: "Parse Workout", subtitle: "JSON", type: "action", icon: "Code", x: 2150, y: 320 },
-    { id: "p2_limit", name: "Limit Workout Length", subtitle: "Truncate", type: "action", icon: "Sliders", x: 2340, y: 320 },
-    { id: "p2_out", name: "Create Workout Post", subtitle: "Discord Send", type: "action", icon: "Send", x: 2530, y: 320 },
-
+    {
+      id: "p2",
+      name: "P2",
+      subtitle: "Condition",
+      detail: "Matches items categorized as workout logs and training entries.",
+      branch: "p2",
+      type: "action",
+      icon: "Check",
+      x: 1580,
+      y: 320,
+    },
+    {
+      id: "p2_http",
+      name: "HTTP Request",
+      subtitle: "Instagram API 2",
+      detail: "Retrieves media details for workout updates.",
+      branch: "p2",
+      type: "action",
+      icon: "Globe",
+      x: 1770,
+      y: 320,
+    },
+    {
+      id: "p2_llm",
+      name: "Basic LLM Chain",
+      subtitle: "Workout LLM",
+      detail: "Formats workout metrics into a clean milestone post.",
+      branch: "p2",
+      type: "ai",
+      icon: "Cpu",
+      x: 1960,
+      y: 320,
+    },
+    {
+      id: "p2_parse",
+      name: "Parse Workout",
+      subtitle: "JSON",
+      detail: "Parses structured workout output fields.",
+      branch: "p2",
+      type: "action",
+      icon: "Code",
+      x: 2150,
+      y: 320,
+    },
+    {
+      id: "p2_limit",
+      name: "Limit Workout Length",
+      subtitle: "Truncate",
+      detail: "Trims caption text to channel constraints.",
+      branch: "p2",
+      type: "action",
+      icon: "Sliders",
+      x: 2340,
+      y: 320,
+    },
+    {
+      id: "p2_out",
+      name: "Create Workout Post",
+      subtitle: "Discord Send",
+      detail: "Posts the formatted workout log to the fitness channel.",
+      branch: "p2",
+      type: "action",
+      icon: "Send",
+      x: 2530,
+      y: 320,
+    },
     // Branch P3 (Media)
-    { id: "p3", name: "P3", subtitle: "Condition", type: "action", icon: "Check", x: 1580, y: 490 },
-    { id: "p3_http", name: "HTTP Request", subtitle: "Instagram API 3", type: "action", icon: "Globe", x: 1770, y: 490 },
-    { id: "p3_llm", name: "Basic LLM Chain", subtitle: "Media LLM", type: "ai", icon: "Cpu", x: 1960, y: 490 },
-    { id: "p3_parse", name: "Parse Media", subtitle: "JSON", type: "action", icon: "Code", x: 2150, y: 490 },
-    { id: "p3_limit", name: "Limit Media Length", subtitle: "Truncate", type: "action", icon: "Sliders", x: 2340, y: 490 },
-    { id: "p3_out", name: "Create Media Post", subtitle: "Discord Send", type: "action", icon: "Send", x: 2530, y: 490 },
+    {
+      id: "p3",
+      name: "P3",
+      subtitle: "Condition",
+      detail: "Matches general media links, articles, and reference clips.",
+      branch: "p3",
+      type: "action",
+      icon: "Check",
+      x: 1580,
+      y: 490,
+    },
+    {
+      id: "p3_http",
+      name: "HTTP Request",
+      subtitle: "Instagram API 3",
+      detail: "Pulls attachment metadata from external media endpoints.",
+      branch: "p3",
+      type: "action",
+      icon: "Globe",
+      x: 1770,
+      y: 490,
+    },
+    {
+      id: "p3_llm",
+      name: "Basic LLM Chain",
+      subtitle: "Media LLM",
+      detail: "Summarizes the shared media link into a concise highlight.",
+      branch: "p3",
+      type: "ai",
+      icon: "Cpu",
+      x: 1960,
+      y: 490,
+    },
+    {
+      id: "p3_parse",
+      name: "Parse Media",
+      subtitle: "JSON",
+      detail: "Validates summarized fields and source URLs.",
+      branch: "p3",
+      type: "action",
+      icon: "Code",
+      x: 2150,
+      y: 490,
+    },
+    {
+      id: "p3_limit",
+      name: "Limit Media Length",
+      subtitle: "Truncate",
+      detail: "Ensures summary fits clean embed character limits.",
+      branch: "p3",
+      type: "action",
+      icon: "Sliders",
+      x: 2340,
+      y: 490,
+    },
+    {
+      id: "p3_out",
+      name: "Create Media Post",
+      subtitle: "Discord Send",
+      detail: "Dispatches the curated media highlight to Discord.",
+      branch: "p3",
+      type: "action",
+      icon: "Send",
+      x: 2530,
+      y: 490,
+    },
   ],
   connections: [
     { from: "n1", to: "n2" },
@@ -75,27 +347,19 @@ export const REAL_N8N_WORKFLOW: Workflow = {
     { from: "n6_sub", to: "n6" },
     { from: "n6", to: "n7" },
     { from: "n7", to: "n8" },
-
-    // Router Outputs
     { from: "n8", to: "p1" },
     { from: "n8", to: "p2" },
     { from: "n8", to: "p3" },
-
-    // Branch 1
     { from: "p1", to: "p1_http" },
     { from: "p1_http", to: "p1_llm" },
     { from: "p1_llm", to: "p1_parse" },
     { from: "p1_parse", to: "p1_limit" },
     { from: "p1_limit", to: "p1_out" },
-
-    // Branch 2
     { from: "p2", to: "p2_http" },
     { from: "p2_http", to: "p2_llm" },
     { from: "p2_llm", to: "p2_parse" },
     { from: "p2_parse", to: "p2_limit" },
     { from: "p2_limit", to: "p2_out" },
-
-    // Branch 3
     { from: "p3", to: "p3_http" },
     { from: "p3_http", to: "p3_llm" },
     { from: "p3_llm", to: "p3_parse" },
@@ -103,3 +367,128 @@ export const REAL_N8N_WORKFLOW: Workflow = {
     { from: "p3_limit", to: "p3_out" },
   ],
 };
+
+export const AI_WEBHOOK_TRIAGE_WORKFLOW: Workflow = {
+  id: "ai-webhook-triage",
+  name: "AI Webhook Triage & CRM Alert Pipeline",
+  shortLabel: "AI Webhook Triage",
+  description:
+    "Event-driven webhook workflow that verifies signatures, enriches payload context via LLM classification, logs to storage, and alerts engineers.",
+  canvasWidth: 1520,
+  canvasHeight: 460,
+  routes: [
+    { id: "high", label: "High Priority" },
+    { id: "std", label: "Standard Queue" },
+  ],
+  nodes: [
+    {
+      id: "w1",
+      name: "Webhook Trigger",
+      subtitle: "POST /events",
+      detail: "Receives signed JSON events from external services in real time.",
+      type: "trigger",
+      icon: "Zap",
+      x: 130,
+      y: 230,
+    },
+    {
+      id: "w2",
+      name: "Verify HMAC",
+      subtitle: "Auth Guard",
+      detail: "Validates webhook signature headers and rejects unauthorized payloads.",
+      type: "action",
+      icon: "Filter",
+      x: 340,
+      y: 230,
+    },
+    {
+      id: "w3",
+      name: "LLM Classifier",
+      subtitle: "Structured JSON",
+      detail: "Scores urgency, extracts entities, and normalizes summary fields.",
+      type: "ai",
+      icon: "Cpu",
+      x: 560,
+      y: 230,
+    },
+    {
+      id: "w3_sub",
+      name: "System Prompt",
+      subtitle: "Triage Policy",
+      detail: "Supplies schema rules and priority thresholds to the classifier.",
+      type: "subnode",
+      icon: "Bot",
+      x: 560,
+      y: 380,
+    },
+    {
+      id: "w4",
+      name: "Priority Switch",
+      subtitle: "Score >= 0.8",
+      detail: "Branches urgent incidents toward instant alerts vs standard CRM sync.",
+      type: "router",
+      icon: "GitBranch",
+      x: 780,
+      y: 230,
+    },
+    {
+      id: "w5_hi",
+      name: "Persist Incident",
+      subtitle: "Postgres Upsert",
+      detail: "Stores high-priority event state and correlation ID.",
+      branch: "high",
+      type: "database",
+      icon: "Code",
+      x: 1020,
+      y: 135,
+    },
+    {
+      id: "w6_hi",
+      name: "Dispatch Alert",
+      subtitle: "Push & Slack",
+      detail: "Notifies on-call channels immediately with triage summary.",
+      branch: "high",
+      type: "action",
+      icon: "Send",
+      x: 1280,
+      y: 135,
+    },
+    {
+      id: "w5_std",
+      name: "Sync CRM Record",
+      subtitle: "REST Batch",
+      detail: "Appends normalized contact and event tags to CRM pipeline.",
+      branch: "std",
+      type: "action",
+      icon: "Globe",
+      x: 1020,
+      y: 325,
+    },
+    {
+      id: "w6_std",
+      name: "Audit Log",
+      subtitle: "200 OK",
+      detail: "Records completion telemetry for periodic reporting.",
+      branch: "std",
+      type: "action",
+      icon: "Check",
+      x: 1280,
+      y: 325,
+    },
+  ],
+  connections: [
+    { from: "w1", to: "w2" },
+    { from: "w2", to: "w3" },
+    { from: "w3_sub", to: "w3" },
+    { from: "w3", to: "w4" },
+    { from: "w4", to: "w5_hi" },
+    { from: "w5_hi", to: "w6_hi" },
+    { from: "w4", to: "w5_std" },
+    { from: "w5_std", to: "w6_std" },
+  ],
+};
+
+export const WORKFLOWS: Workflow[] = [
+  REAL_N8N_WORKFLOW,
+  AI_WEBHOOK_TRIAGE_WORKFLOW,
+];

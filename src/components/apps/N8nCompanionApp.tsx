@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Network, Play, RefreshCw, Server, CheckCircle2, AlertTriangle, Activity } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Network, Play, Server, Activity } from "lucide-react";
 
 interface N8nWorkflow {
   id: string;
@@ -13,6 +13,15 @@ interface N8nWorkflow {
 
 export default function N8nCompanionApp() {
   const [server, setServer] = useState("n8n-prod-01.internal");
+  const runTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+  useEffect(() => {
+    const timers = runTimersRef.current;
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
+    };
+  }, []);
 
   const [workflows, setWorkflows] = useState<N8nWorkflow[]>([
     { id: "1", name: "AI Lead Scoring & Webhook", active: true, lastRun: "2 mins ago", status: "Success" },
@@ -44,7 +53,8 @@ export default function N8nCompanionApp() {
       ...prev.slice(0, 3),
     ]);
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
+      runTimersRef.current.delete(timer);
       setWorkflows((prev) =>
         prev.map((w) => (w.id === wf.id ? { ...w, status: "Success" } : w))
       );
@@ -53,6 +63,7 @@ export default function N8nCompanionApp() {
         ...prev.slice(0, 3),
       ]);
     }, 1200);
+    runTimersRef.current.add(timer);
   };
 
   return (
@@ -88,8 +99,12 @@ export default function N8nCompanionApp() {
             <div className="flex items-start gap-2.5 overflow-hidden">
               {/* Active Toggle Switch */}
               <button
+                type="button"
+                role="switch"
+                aria-checked={wf.active}
+                aria-label={`Toggle ${wf.name} active state`}
                 onClick={() => toggleWorkflow(wf.id)}
-                className={`w-9 h-5 rounded-full p-0.5 border transition-colors shrink-0 mt-0.5 ${
+                className={`w-9 h-5 rounded-full p-0.5 border transition-colors shrink-0 mt-0.5 cursor-pointer ${
                   wf.active
                     ? "bg-white border-white justify-end"
                     : "bg-mono-950 border-mono-700 justify-start"

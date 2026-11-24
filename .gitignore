@@ -3,6 +3,7 @@ node_modules/
 out/
 dist/
 build/
+*.tsbuildinfo
 .DS_Store
 *.log
 .env
@@ -10,11 +11,8 @@ build/
 !.env.example
 
 # Nested source repositories and generated Flutter build output
-public/apps/repos/**/.git/
-public/apps/repos/**/.dart_tool/
-public/apps/repos/**/build/
-public/apps/repos/**/Pods/
-public/apps/repos/**/.idea/
+/repos/
+public/apps/repos/
 .open-next/
 .wrangler/
 .dev.vars

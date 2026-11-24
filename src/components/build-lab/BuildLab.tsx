@@ -27,7 +27,7 @@ export default function BuildLab({ onLaunch }: BuildLabProps) {
             BUILD LAB
           </h2>
           <p className="text-sm sm:text-base text-mono-400 max-w-lg font-light">
-            Don't just read about code. Click below to launch live applications directly inside an expanded mobile environment.
+            Don&apos;t just read about code. Click below to launch live applications directly inside an expanded mobile environment.
           </p>
         </div>
 

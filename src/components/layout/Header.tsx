@@ -23,31 +23,51 @@ export default function Header() {
   useEffect(() => {
     let ticking = false;
 
+    const updateActiveSection = () => {
+      const isScrolled = window.scrollY > 40;
+      setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
+
+      const sections = NAV_ITEMS.map((item) => item.href.substring(1));
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 40;
+
+      if (atBottom && sections.length > 0) {
+        const lastSection = sections[sections.length - 1];
+        setActiveSection((prev) => (prev !== lastSection ? lastSection : prev));
+        return;
+      }
+
+      let current = sections[0] ?? "hero";
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 250) {
+            current = section;
+          }
+        }
+      }
+      setActiveSection((prev) => (prev !== current ? current : prev));
+    };
+
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          const isScrolled = window.scrollY > 40;
-          setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
-
-          const sections = NAV_ITEMS.map((item) => item.href.substring(1));
-          for (const section of sections) {
-            const el = document.getElementById(section);
-            if (el) {
-              const rect = el.getBoundingClientRect();
-              if (rect.top <= 250 && rect.bottom >= 250) {
-                setActiveSection((prev) => (prev !== section ? section : prev));
-                break;
-              }
-            }
-          }
+          updateActiveSection();
           ticking = false;
         });
         ticking = true;
       }
     };
 
+    updateActiveSection();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
   const scrollToSection = (href: string) => {
@@ -81,7 +101,7 @@ export default function Header() {
             />
           </div>
           <span className="font-semibold tracking-wider text-white">MSO</span>
-          <span className="hidden sm:inline-block text-mono-500">// DEV</span>
+          <span className="hidden sm:inline-block text-mono-500">{"// DEV"}</span>
         </button>
 
         {/* Desktop Navigation Links */}

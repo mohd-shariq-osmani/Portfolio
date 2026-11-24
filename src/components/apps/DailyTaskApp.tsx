@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Plus, Trash2, Calendar, CheckCircle2, Clock, Sparkles } from "lucide-react";
+import { Check, Plus, Trash2, CheckCircle2, Clock } from "lucide-react";
 
 interface Task {
   id: string;
@@ -116,11 +116,13 @@ export default function DailyTaskApp() {
           value={newTaskTitle}
           onChange={(e) => setNewTaskTitle(e.target.value)}
           placeholder="New task..."
+          aria-label="New task title"
           className="flex-1 px-3 py-1.5 bg-mono-900 border border-mono-800 rounded-lg text-xs text-white placeholder-mono-500 focus:outline-none focus:border-mono-500"
         />
         <select
           value={newTaskPriority}
-          onChange={(e) => setNewTaskPriority(e.target.value as any)}
+          onChange={(e) => setNewTaskPriority(e.target.value as Task["priority"])}
+          aria-label="New task priority"
           className="px-2 py-1.5 bg-mono-900 border border-mono-800 rounded-lg text-xs text-mono-300 focus:outline-none"
         >
           <option value="High">High</option>
@@ -129,7 +131,8 @@ export default function DailyTaskApp() {
         </select>
         <button
           type="submit"
-          className="px-3 py-1.5 bg-white text-black rounded-lg text-xs font-bold hover:bg-mono-200 transition-colors flex items-center justify-center"
+          aria-label="Add task"
+          className="px-3 py-1.5 bg-white text-black rounded-lg text-xs font-bold hover:bg-mono-200 transition-colors flex items-center justify-center cursor-pointer"
         >
           <Plus size={14} />
         </button>
@@ -154,8 +157,10 @@ export default function DailyTaskApp() {
             >
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <button
+                  type="button"
                   onClick={() => toggleTask(t.id)}
-                  className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                  aria-label={t.completed ? `Mark "${t.title}" incomplete` : `Mark "${t.title}" complete`}
+                  className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
                     t.completed
                       ? "bg-white border-white text-black"
                       : "border-mono-600 hover:border-white"
@@ -191,8 +196,10 @@ export default function DailyTaskApp() {
                   {t.priority}
                 </span>
                 <button
+                  type="button"
                   onClick={() => deleteTask(t.id)}
-                  className="p-1 text-mono-500 hover:text-white transition-colors"
+                  aria-label={`Delete "${t.title}"`}
+                  className="p-1 text-mono-500 hover:text-white transition-colors cursor-pointer"
                 >
                   <Trash2 size={12} />
                 </button>

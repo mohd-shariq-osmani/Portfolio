@@ -6,6 +6,14 @@ export function setActiveLenis(instance: Lenis | null) {
   activeLenis = instance;
 }
 
+export function pauseLenis() {
+  activeLenis?.stop();
+}
+
+export function resumeLenis() {
+  activeLenis?.start();
+}
+
 export function scrollToTarget(target: string, offset = -88) {
   if (typeof window === "undefined") return;
 

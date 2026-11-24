@@ -1,1 +1,0 @@
-// Discarded generated AppIntent code.

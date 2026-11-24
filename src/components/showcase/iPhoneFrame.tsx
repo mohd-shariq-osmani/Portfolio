@@ -1,12 +1,9 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+import { Maximize2 } from "lucide-react";
 import { Project } from "@/data/projects";
-import DailyTaskApp from "@/components/apps/DailyTaskApp";
-import VaultApp from "@/components/apps/VaultApp";
-import N8nCompanionApp from "@/components/apps/N8nCompanionApp";
-import RelayApp from "@/components/apps/RelayApp";
-import { Maximize2, RefreshCw, Smartphone, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import ProjectViewport, { PreviewMode } from "./ProjectViewport";
 
 interface IPhoneFrameProps {
   project: Project;
@@ -14,59 +11,37 @@ interface IPhoneFrameProps {
 }
 
 export default function IPhoneFrame({ project, onLaunchBuildLab }: IPhoneFrameProps) {
-  const [iframeKey, setIframeKey] = useState(0);
-  // Default to fast, lightweight React simulator to avoid heavy WebGL/WASM memory pressure on mobile WebKit
-  const [useFallback, setUseFallback] = useState(true);
+  const [reloadNonce, setReloadNonce] = useState(0);
+  // Default to fast, lightweight React simulator to avoid heavy WebGL/WASM memory pressure on initial load
+  const [mode, setMode] = useState<PreviewMode>("sim");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Auto-detect mobile touch devices: default to the lightweight, native-feeling
-  // React simulator to avoid loading heavy 30MB+ WebGL/WASM runtimes that throttle iOS WebKit
   useEffect(() => {
-    const isMobile =
-      typeof window !== "undefined" &&
-      (window.innerWidth < 768 ||
-        "ontouchstart" in window ||
-        navigator.maxTouchPoints > 0);
-    if (isMobile) {
-      setUseFallback(true);
-      setIsLoading(false);
-    }
+    setMode("sim");
+    setIsLoading(false);
+    setReloadNonce(0);
+  }, [project.id]);
+
+  const handleModeChange = useCallback((nextMode: PreviewMode) => {
+    setMode(nextMode);
+    setIsLoading(nextMode === "live");
   }, []);
 
-  useEffect(() => {
-    if (useFallback) {
-      setIsLoading(false);
-      return;
+  const handleReload = useCallback(() => {
+    setReloadNonce((prev) => prev + 1);
+    if (mode === "live") {
+      setIsLoading(true);
     }
-    setIsLoading(true);
-    // Timeout safety guard: if iframe takes > 2s to load, switch to responsive simulator
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+  }, [mode]);
 
-    return () => clearTimeout(timer);
-  }, [project.id, iframeKey, useFallback]);
+  const handleLoaded = useCallback(() => {
+    setIsLoading(false);
+  }, []);
 
-  const handleRefresh = () => {
-    setUseFallback(false);
-    setIsLoading(true);
-    setIframeKey((prev) => prev + 1);
-  };
-
-  const renderFallbackApp = () => {
-    switch (project.id) {
-      case "dailytask":
-        return <DailyTaskApp />;
-      case "vault":
-        return <VaultApp />;
-      case "n8n-companion":
-        return <N8nCompanionApp />;
-      case "relay":
-        return <RelayApp />;
-      default:
-        return <DailyTaskApp />;
-    }
-  };
+  const handleLoadError = useCallback(() => {
+    setIsLoading(false);
+    setMode("sim");
+  }, []);
 
   return (
     <div className="relative group flex flex-col items-center">
@@ -80,71 +55,34 @@ export default function IPhoneFrame({ project, onLaunchBuildLab }: IPhoneFramePr
         {/* Screen viewport */}
         <div className="relative h-full w-full overflow-hidden rounded-[39px] border border-white/10 bg-black shadow-[inset_0_0_0_1px_rgba(0,0,0,0.8)]">
           {/* Dynamic Island */}
-          <div className="absolute left-1/2 top-3 z-30 flex h-6 w-[88px] -translate-x-1/2 items-center justify-end gap-2 rounded-full border border-white/10 bg-black px-3 shadow-[0_2px_10px_rgba(0,0,0,0.45)]">
+          <div className="absolute left-1/2 top-3 z-30 flex h-6 w-[88px] -translate-x-1/2 items-center justify-end gap-2 rounded-full border border-white/10 bg-black px-3 shadow-[0_2px_10px_rgba(0,0,0,0.45)] pointer-events-none">
             <div className="h-3 w-3 rounded-full border border-mono-700 bg-mono-900" />
             <div className="h-2 w-2 rounded-full bg-mono-800" />
           </div>
 
-          <div className="relative flex h-full w-full flex-col bg-black pb-4 pt-8">
-          {!useFallback && project.type === "flutter-web" && project.demoUrl ? (
-            <div className="relative h-full w-full">
-              {/* Top Controls bar */}
-              <div className="absolute top-0 left-0 right-0 h-8 bg-mono-950/90 border-b border-mono-850 z-20 flex items-center justify-between px-3">
-                <span className="text-[9px] font-mono text-mono-400 uppercase">
-                  Flutter Web Engine
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setUseFallback(true)}
-                    className="cursor-pointer text-[9px] font-mono text-mono-400 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/70"
-                  >
-                    Sim Mode
-                  </button>
-                  <button
-                    onClick={handleRefresh}
-                    className="cursor-pointer rounded p-1 text-mono-400 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/70"
-                    title="Reload App"
-                  >
-                    <RefreshCw size={11} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Loading Indicator Spinner */}
-              {isLoading && (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-mono-950/90 p-4 pt-8 text-center backdrop-blur-sm">
-                  <Loader2 size={24} className="text-white animate-spin mb-2" />
-                  <span className="text-xs font-mono text-white">Loading Engine...</span>
-                  <span className="text-[10px] font-mono text-mono-500 mt-1">{project.title}</span>
-                </div>
-              )}
-
-              {/* Real Compiled Flutter Web Iframe */}
-              <iframe
-                key={iframeKey}
-                src={project.demoUrl}
-                title={`${project.title} Flutter Web`}
-                loading="lazy"
-                className="h-full w-full border-0"
-                onLoad={() => setIsLoading(false)}
-                onError={() => setUseFallback(true)}
-              />
-            </div>
-          ) : (
-            <div className="relative h-full w-full">
-              {renderFallbackApp()}
-            </div>
-          )}
+          <div className="relative flex h-full w-full flex-col bg-black pb-4 pt-10">
+            <ProjectViewport
+              project={project}
+              mode={mode}
+              onModeChange={handleModeChange}
+              reloadNonce={reloadNonce}
+              onReload={handleReload}
+              isLoading={isLoading}
+              onLoaded={handleLoaded}
+              onLoadError={handleLoadError}
+              showTopBar
+            />
           </div>
         </div>
 
         {/* Home bar indicator */}
-        <div className="absolute bottom-3 left-1/2 z-30 h-1 w-28 -translate-x-1/2 rounded-full bg-white/60" />
+        <div className="absolute bottom-3 left-1/2 z-30 h-1 w-28 -translate-x-1/2 rounded-full bg-white/60 pointer-events-none" />
       </div>
 
       {/* Quick Launch Control Below Phone */}
       {onLaunchBuildLab && (
         <button
+          type="button"
           onClick={() => onLaunchBuildLab(project)}
           className="mt-5 flex cursor-pointer items-center gap-1.5 rounded-full border border-mono-800 bg-mono-950 px-4 py-2 text-xs font-mono text-mono-300 transition-all hover:border-white hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
         >
