@@ -14,58 +14,51 @@ interface Particle {
 }
 
 export default function ParticleGrid() {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    let animationFrameId: number;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const isCoarsePointer =
+      window.matchMedia("(pointer: coarse)").matches ||
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0;
+
+    let animationFrameId: number | null = null;
+    let isInView = true;
+    let isPageVisible = !document.hidden;
     let width = 0;
     let height = 0;
     let dpr = 1;
+    let lastFrameTime = 0;
 
     let particles: Particle[] = [];
     const mouse = { x: -2000, y: -2000, targetX: -2000, targetY: -2000 };
 
-    let lastWidth = typeof window !== "undefined" ? window.innerWidth : 0;
+    let lastWidth = window.innerWidth;
     let cachedRect: DOMRect | null = null;
-
-    const setupCanvas = () => {
-      cachedRect = canvas.getBoundingClientRect();
-      width = Math.floor(canvas.clientWidth || cachedRect.width || window.innerWidth);
-      height = Math.floor(canvas.clientHeight || cachedRect.height || window.innerHeight);
-      const isMobile = width < 768;
-      // On mobile screens, DPR 1 cuts pixel rendering overhead by 4x on iOS WebKit
-      dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
-
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(dpr, dpr);
-
-      createParticles();
-    };
 
     const createParticles = () => {
       particles = [];
       const isMobile = width < 768;
-      // Streamlined count on mobile for silky smooth 60/120fps
       const count = isMobile
-        ? Math.min(24, Math.max(16, Math.floor((width * height) / 24000)))
-        : Math.min(Math.max(50, Math.floor((width * height) / 14000)), 90);
+        ? Math.min(20, Math.max(14, Math.floor((width * height) / 28000)))
+        : Math.min(Math.max(48, Math.floor((width * height) / 15000)), 85);
 
       for (let i = 0; i < count; i++) {
         const isWhite = Math.random() > 0.4;
         const baseAlpha = isWhite
-          ? Math.random() * 0.4 + 0.35 // 0.35 - 0.75 for crisp visibility
-          : Math.random() * 0.25 + 0.2; // 0.20 - 0.45 for greys
+          ? Math.random() * 0.4 + 0.35
+          : Math.random() * 0.25 + 0.2;
 
         particles.push({
           x: Math.random() * width,
@@ -80,87 +73,54 @@ export default function ParticleGrid() {
       }
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!cachedRect) cachedRect = canvas.getBoundingClientRect();
-      mouse.targetX = e.clientX - cachedRect.left;
-      mouse.targetY = e.clientY - cachedRect.top;
-    };
-
-    const handleMouseLeave = () => {
-      mouse.targetX = -2000;
-      mouse.targetY = -2000;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        if (!cachedRect) cachedRect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        mouse.targetX = touch.clientX - cachedRect.left;
-        mouse.targetY = touch.clientY - cachedRect.top;
-      }
-    };
-
-    const handleTouchEnd = () => {
-      mouse.targetX = -2000;
-      mouse.targetY = -2000;
-    };
-
-    const handleResize = () => {
-      const currentWidth = window.innerWidth;
-      // On iOS Safari, scrolling dynamic address bar triggers vertical resize events.
-      // We ONLY reconfigure the canvas if the viewport width changes significantly.
-      if (Math.abs(currentWidth - lastWidth) > 15) {
-        lastWidth = currentWidth;
-        setupCanvas();
-      }
-    };
-
     const drawScene = () => {
-      if (!ctx || width === 0 || height === 0) return;
+      if (width === 0 || height === 0) return;
       ctx.clearRect(0, 0, width, height);
 
       const isMobile = width < 768;
-      const maxConnectDist = isMobile ? 95 : 135;
+      const maxConnectDist = isMobile ? 90 : 135;
       const maxConnectDistSq = maxConnectDist * maxConnectDist;
-      const mouseRadius = isMobile ? 120 : 180;
+      const mouseRadius = 180;
 
-      // Smooth cursor / touch lerp
-      mouse.x += (mouse.targetX - mouse.x) * 0.1;
-      mouse.y += (mouse.targetY - mouse.y) * 0.1;
+      if (!isCoarsePointer) {
+        mouse.x += (mouse.targetX - mouse.x) * 0.1;
+        mouse.y += (mouse.targetY - mouse.y) * 0.1;
+      }
 
       const len = particles.length;
 
-      // 1. Update positions & draw particles
       for (let i = 0; i < len; i++) {
         const p = particles[i];
 
-        p.x += p.vx;
-        p.y += p.vy;
+        if (!prefersReducedMotion) {
+          p.x += p.vx;
+          p.y += p.vy;
 
-        // Wrap around boundaries
-        if (p.x < -15) p.x = width + 15;
-        else if (p.x > width + 15) p.x = -15;
+          if (p.x < -15) p.x = width + 15;
+          else if (p.x > width + 15) p.x = -15;
 
-        if (p.y < -15) p.y = height + 15;
-        else if (p.y > height + 15) p.y = -15;
+          if (p.y < -15) p.y = height + 15;
+          else if (p.y > height + 15) p.y = -15;
 
-        // Cursor deflection & illumination (skip if offscreen)
-        if (mouse.x > 0 && mouse.y > 0) {
-          const dxMouse = mouse.x - p.x;
-          const dyMouse = mouse.y - p.y;
-          const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+          if (!isCoarsePointer && mouse.x > 0 && mouse.y > 0) {
+            const dxMouse = mouse.x - p.x;
+            const dyMouse = mouse.y - p.y;
+            const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
 
-          if (distMouse < mouseRadius && distMouse > 0) {
-            const force = (1 - distMouse / mouseRadius) * 0.45;
-            p.x -= (dxMouse / distMouse) * force;
-            p.y -= (dyMouse / distMouse) * force;
-            p.alpha = Math.min(p.baseAlpha + (1 - distMouse / mouseRadius) * 0.5, 0.95);
-          } else {
-            p.alpha += (p.baseAlpha - p.alpha) * 0.05;
+            if (distMouse < mouseRadius && distMouse > 0) {
+              const force = (1 - distMouse / mouseRadius) * 0.45;
+              p.x -= (dxMouse / distMouse) * force;
+              p.y -= (dyMouse / distMouse) * force;
+              p.alpha = Math.min(
+                p.baseAlpha + (1 - distMouse / mouseRadius) * 0.5,
+                0.95
+              );
+            } else {
+              p.alpha += (p.baseAlpha - p.alpha) * 0.05;
+            }
           }
         }
 
-        // Draw particle
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = p.isWhite
@@ -169,7 +129,6 @@ export default function ParticleGrid() {
         ctx.fill();
       }
 
-      // 2. Draw connecting network lines - batched in single draw call for high-performance rendering on mobile WebKit
       ctx.beginPath();
       ctx.lineWidth = 0.75;
       ctx.strokeStyle = "rgba(255, 255, 255, 0.14)";
@@ -189,8 +148,7 @@ export default function ParticleGrid() {
       }
       ctx.stroke();
 
-      // Connecting line to cursor / touch if active
-      if (mouse.x > 0 && mouse.y > 0) {
+      if (!isCoarsePointer && mouse.x > 0 && mouse.y > 0) {
         ctx.beginPath();
         ctx.lineWidth = 0.75;
         ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
@@ -198,8 +156,7 @@ export default function ParticleGrid() {
           const p1 = particles[i];
           const dxM = p1.x - mouse.x;
           const dyM = p1.y - mouse.y;
-          const distMSq = dxM * dxM + dyM * dyM;
-          if (distMSq < mouseRadius * mouseRadius) {
+          if (dxM * dxM + dyM * dyM < mouseRadius * mouseRadius) {
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(mouse.x, mouse.y);
           }
@@ -208,46 +165,133 @@ export default function ParticleGrid() {
       }
     };
 
-    const loop = () => {
-      // Direct viewport check: instantly animates on mount and pauses only when scrolled far past hero
-      const inView = typeof window !== "undefined" ? window.scrollY < (height || window.innerHeight) * 1.3 : true;
-      if (inView) {
+    const setupCanvas = () => {
+      cachedRect = canvas.getBoundingClientRect();
+      width = Math.floor(
+        canvas.clientWidth || cachedRect.width || window.innerWidth
+      );
+      height = Math.floor(
+        canvas.clientHeight || cachedRect.height || window.innerHeight
+      );
+      const isMobile = width < 768 || isCoarsePointer;
+      dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+
+      createParticles();
+    };
+
+    const stopLoop = () => {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    };
+
+    const loop = (now: number) => {
+      if (!isInView || !isPageVisible || prefersReducedMotion) {
+        animationFrameId = null;
+        return;
+      }
+
+      // Cap mobile/touch frame rate at ~30fps so scroll & CoreAnimation remain completely smooth on iOS
+      const minInterval = isCoarsePointer || width < 768 ? 33 : 0;
+      if (minInterval === 0 || now - lastFrameTime >= minInterval) {
+        lastFrameTime = now;
         drawScene();
       }
+
       animationFrameId = requestAnimationFrame(loop);
     };
 
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        cancelAnimationFrame(animationFrameId);
-      } else {
+    const startLoop = () => {
+      if (prefersReducedMotion) {
+        drawScene();
+        return;
+      }
+      if (animationFrameId === null && isInView && isPageVisible) {
+        lastFrameTime = 0;
         animationFrameId = requestAnimationFrame(loop);
       }
     };
 
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!cachedRect) cachedRect = canvas.getBoundingClientRect();
+      mouse.targetX = e.clientX - cachedRect.left;
+      mouse.targetY = e.clientY - cachedRect.top;
+    };
+
+    const handleMouseLeave = () => {
+      mouse.targetX = -2000;
+      mouse.targetY = -2000;
+    };
+
+    const handleResize = () => {
+      const currentWidth = window.innerWidth;
+      if (Math.abs(currentWidth - lastWidth) > 15) {
+        lastWidth = currentWidth;
+        setupCanvas();
+        if (prefersReducedMotion) {
+          drawScene();
+        }
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      isPageVisible = !document.hidden;
+      if (isPageVisible) {
+        startLoop();
+      } else {
+        stopLoop();
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        isInView = entries.some((entry) => entry.isIntersecting);
+        if (isInView) {
+          startLoop();
+        } else {
+          stopLoop();
+        }
+      },
+      { threshold: 0 }
+    );
+
     setupCanvas();
-    animationFrameId = requestAnimationFrame(loop);
+    observer.observe(container);
+    startLoop();
 
     window.addEventListener("resize", handleResize);
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    window.addEventListener("mouseleave", handleMouseLeave);
-    window.addEventListener("touchmove", handleTouchMove, { passive: true });
-    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    if (!isCoarsePointer) {
+      window.addEventListener("mousemove", handleMouseMove, { passive: true });
+      window.addEventListener("mouseleave", handleMouseLeave);
+    }
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
+      stopLoop();
+      observer.disconnect();
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseleave", handleMouseLeave);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
+      if (!isCoarsePointer) {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseleave", handleMouseLeave);
+      }
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+    <div
+      ref={containerRef}
+      className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
+    >
       <canvas
         ref={canvasRef}
         className="w-full h-full block"

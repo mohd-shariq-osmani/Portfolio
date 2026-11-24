@@ -54,7 +54,7 @@ export default function IPhoneShowcase({ onLaunchBuildLab }: iPhoneShowcaseProps
           return (
             <div
               key={project.id}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-mono-950 sm:bg-mono-950/80 border border-mono-850 rounded-3xl p-6 sm:p-10 shadow-2xl sm:backdrop-blur-xl transition-all duration-300"
+              className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-mono-950 md:bg-mono-950/80 border border-mono-850 rounded-3xl p-6 sm:p-10 shadow-2xl md:backdrop-blur-xl transition-all duration-300"
             >
               {/* Left Column: Project Details & Case Study */}
               <div className="lg:col-span-7 flex flex-col justify-center gap-6">

@@ -41,18 +41,34 @@ export default function CatMascot({
   const bubbleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const jumpTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const blinkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const blinkResetRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Periodic natural eye blinking (every 3.5 - 5.5s for ~180ms)
+  // Only run periodic eye blinking on the viewport variant that is actually visible
   useEffect(() => {
-    let active = true;
+    const mediaQuery = window.matchMedia(
+      variant === "floating" ? "(min-width: 768px)" : "(max-width: 767px)"
+    );
+    let active = mediaQuery.matches;
+
+    const clearBlinkTimers = () => {
+      if (blinkTimeoutRef.current) {
+        clearTimeout(blinkTimeoutRef.current);
+        blinkTimeoutRef.current = null;
+      }
+      if (blinkResetRef.current) {
+        clearTimeout(blinkResetRef.current);
+        blinkResetRef.current = null;
+      }
+    };
 
     const scheduleNextBlink = () => {
+      if (!active) return;
       const delay = Math.floor(Math.random() * 2000) + 3500;
       blinkTimeoutRef.current = setTimeout(() => {
         if (!active) return;
         setPose((prev) => (prev === "idle" ? "blink" : prev));
 
-        setTimeout(() => {
+        blinkResetRef.current = setTimeout(() => {
           if (!active) return;
           setPose("idle");
           scheduleNextBlink();
@@ -60,13 +76,26 @@ export default function CatMascot({
       }, delay);
     };
 
-    scheduleNextBlink();
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      active = e.matches;
+      clearBlinkTimers();
+      setPose("idle");
+      if (active) {
+        scheduleNextBlink();
+      }
+    };
 
+    if (active) {
+      scheduleNextBlink();
+    }
+
+    mediaQuery.addEventListener("change", handleMediaChange);
     return () => {
       active = false;
-      if (blinkTimeoutRef.current) clearTimeout(blinkTimeoutRef.current);
+      clearBlinkTimers();
+      mediaQuery.removeEventListener("change", handleMediaChange);
     };
-  }, []);
+  }, [variant]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -97,7 +126,32 @@ export default function CatMascot({
     }, 2000);
   }, []);
 
-  const currentSrc = CAT_ASSETS[pose] || CAT_ASSETS.idle;
+  const renderLayeredCat = (altText: string, prioritize: boolean) => (
+    <>
+      <Image
+        src={CAT_ASSETS.idle}
+        alt={altText}
+        width={521}
+        height={527}
+        priority={prioritize}
+        unoptimized
+        className={`pixel-art w-full h-full object-contain ${
+          pose === "blink" ? "opacity-0" : "opacity-100"
+        }`}
+      />
+      <Image
+        src={CAT_ASSETS.blink}
+        alt=""
+        aria-hidden="true"
+        width={521}
+        height={527}
+        unoptimized
+        className={`pixel-art absolute inset-0 w-full h-full object-contain ${
+          pose === "blink" ? "opacity-100" : "opacity-0"
+        }`}
+      />
+    </>
+  );
 
   if (variant === "floating") {
     return (
@@ -113,7 +167,7 @@ export default function CatMascot({
           }`}
         >
           {bubbleText && (
-            <div className="relative px-3 py-1.5 bg-black/95 text-white font-mono text-[11px] rounded-lg border border-mono-750 shadow-[0_8px_24px_rgba(0,0,0,0.85)] backdrop-blur-md flex items-center gap-1.5">
+            <div className="relative px-3 py-1.5 bg-black/95 text-white font-mono text-[11px] rounded-lg border border-mono-750 shadow-[0_8px_24px_rgba(0,0,0,0.85)] flex items-center gap-1.5">
               <span>{bubbleText}</span>
               <div className="absolute -bottom-1.5 right-6 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-mono-750" />
             </div>
@@ -122,7 +176,7 @@ export default function CatMascot({
 
         {/* Hover Hint Tooltip (only when not showing speech bubble) */}
         {!bubbleText && showTooltip && (
-          <div className="pointer-events-none mb-1 px-2.5 py-1 bg-mono-950/90 text-mono-300 font-mono text-[10px] rounded-md border border-mono-800 shadow-lg backdrop-blur-sm animate-cat-bubble">
+          <div className="pointer-events-none mb-1 px-2.5 py-1 bg-mono-950/95 text-mono-300 font-mono text-[10px] rounded-md border border-mono-800 shadow-lg animate-cat-bubble">
             Click me! 🐾
           </div>
         )}
@@ -143,21 +197,12 @@ export default function CatMascot({
           aria-label="MSO's Pixel Cat Mascot - Click to make cat jump"
           className="pointer-events-auto relative p-0 bg-transparent border-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 rounded-lg active:scale-95 transition-transform"
         >
-          {/* Crisp Pixel-Art Cat (clean standalone without card/box background) */}
           <div
             className={`relative w-[108px] sm:w-[120px] aspect-[521/527] ${
               isJumping ? "animate-cat-jump" : "animate-cat-idle"
             }`}
           >
-            <Image
-              src={currentSrc}
-              alt="White pixel-art cat mascot"
-              width={521}
-              height={527}
-              priority
-              unoptimized
-              className="pixel-art w-full h-full object-contain"
-            />
+            {renderLayeredCat("White pixel-art cat mascot", false)}
           </div>
         </button>
       </aside>
@@ -178,7 +223,7 @@ export default function CatMascot({
         }`}
       >
         {bubbleText && (
-          <div className="relative px-3.5 py-1.5 bg-black/95 text-white font-mono text-xs rounded-lg border border-mono-700 shadow-xl backdrop-blur-md">
+          <div className="relative px-3.5 py-1.5 bg-black/95 text-white font-mono text-xs rounded-lg border border-mono-700 shadow-xl">
             <span>{bubbleText}</span>
             <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-mono-700" />
           </div>
@@ -193,21 +238,12 @@ export default function CatMascot({
         aria-label="Tap to interact with pixel cat mascot"
         className="relative p-0 bg-transparent border-0 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 rounded-lg transition-transform"
       >
-        {/* Crisp Pixel-Art Cat (larger on mobile, clean standalone without background box) */}
         <div
           className={`relative w-[145px] sm:w-[160px] aspect-[521/527] ${
             isJumping ? "animate-cat-jump" : "animate-cat-idle"
           }`}
         >
-          <Image
-            src={currentSrc}
-            alt="White pixel-art cat mascot companion"
-            width={521}
-            height={527}
-            priority
-            unoptimized
-            className="pixel-art w-full h-full object-contain"
-          />
+          {renderLayeredCat("White pixel-art cat mascot companion", true)}
         </div>
       </button>
     </div>

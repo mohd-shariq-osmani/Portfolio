@@ -13,13 +13,20 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen min-h-[100dvh] w-full flex flex-col justify-between items-center px-4 sm:px-8 pt-24 sm:pt-28 pb-8 sm:pb-12 bg-black text-white overflow-x-hidden"
+      className="relative min-h-[100svh] w-full flex flex-col justify-between items-center px-4 sm:px-8 pt-24 sm:pt-28 pb-8 sm:pb-12 bg-black text-white overflow-x-clip"
     >
       {/* Background Floating Monochrome Particle Network */}
       <ParticleGrid />
 
-      {/* Subtle Monochrome Ambient Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-white/[0.04] blur-[150px] rounded-full pointer-events-none z-0" />
+      {/* Subtle Monochrome Ambient Glow (pure radial gradient - zero offscreen blur texture) */}
+      <div
+        aria-hidden="true"
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[760px] h-[380px] pointer-events-none z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at top center, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.025) 45%, transparent 75%)",
+        }}
+      />
 
       {/* Main Hero Content */}
       <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center justify-center my-auto py-6 sm:py-12">
@@ -29,15 +36,12 @@ export default function Hero() {
           <span>Crafting High-Performance Systems</span>
         </div>
 
-        {/* Name Typography with Horizontal Scanning Reveal */}
+        {/* Name Typography */}
         <div className="relative mb-5 sm:mb-6 select-none inline-block max-w-full px-4 sm:px-8 py-2 overflow-hidden">
-          {/* Laser Scan Line - GPU Accelerated CSS */}
-          <div className="absolute top-0 bottom-0 w-[3px] z-20 pointer-events-none bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_20px_#ffffff,0_0_40px_#ffffff] animate-laser-line" />
+          {/* Laser Scan Line - Desktop GPU transform only */}
+          <div className="hidden md:block absolute top-0 bottom-0 left-0 w-[2px] z-20 pointer-events-none bg-gradient-to-b from-transparent via-white to-transparent animate-laser-line" />
 
-          {/* Laser Trailing Wash - GPU Accelerated CSS */}
-          <div className="absolute top-0 bottom-0 w-36 z-10 pointer-events-none bg-gradient-to-r from-transparent via-white/25 to-transparent blur-md animate-laser-wash" />
-
-          {/* Hero Name Typography - With Laser Wipe Reveal */}
+          {/* Hero Name Typography */}
           <h1 className="text-4xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.95] text-balance font-display text-white pr-4 sm:pr-8 pb-2 animate-title-reveal">
             MOHD SHARIQ <br />
             <span className="text-mono-400">OSMANI</span>

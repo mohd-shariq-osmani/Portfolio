@@ -74,6 +74,12 @@ export default function WorkflowCanvas() {
   const canvasScrollRef = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  useEffect(() => {
+    if (window.innerWidth < 640) {
+      setZoom(0.55);
+    }
+  }, []);
+
   const stopExecution = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -290,12 +296,21 @@ export default function WorkflowCanvas() {
 
       {/* Main n8n Visual Node Canvas Viewport */}
       <div className="relative">
+        {/* Faint Dot Grid Pattern sized to visible viewport instead of 2740px offscreen texture */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none opacity-20 z-0"
+          style={{
+            backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
         <div
           ref={canvasScrollRef}
           data-lenis-prevent
           tabIndex={0}
           aria-label="Scrollable n8n workflow canvas"
-          className="workflow-scrollbar relative w-full h-[460px] sm:h-[520px] bg-black overflow-auto overscroll-contain focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+          className="workflow-scrollbar relative z-10 w-full h-[460px] sm:h-[520px] bg-transparent overflow-auto overscroll-contain focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
         >
           <div
             style={{
@@ -313,16 +328,6 @@ export default function WorkflowCanvas() {
               }}
               className="relative"
             >
-              {/* Faint Dot Grid Pattern */}
-              <div
-                className="absolute inset-0 pointer-events-none opacity-20"
-                style={{
-                  backgroundImage: `radial-gradient(#ffffff 1px, transparent 1px)`,
-                  backgroundSize: "24px 24px",
-                  width: `${workflow.canvasWidth}px`,
-                  height: `${workflow.canvasHeight}px`,
-                }}
-              />
 
               {/* SVG Canvas for Curved Bezier Paths */}
               <svg
@@ -395,7 +400,7 @@ export default function WorkflowCanvas() {
                       top: `${node.y}px`,
                       transform: "translate(-50%, -50%)",
                     }}
-                    className={`absolute z-10 flex h-[52px] w-[176px] items-center gap-2.5 rounded-xl border px-3 py-2 text-left shadow-lg transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                    className={`absolute z-10 flex h-[52px] w-[176px] items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                       isActive
                         ? "bg-mono-800 border-white ring-2 ring-white/60 scale-105"
                         : isSelected

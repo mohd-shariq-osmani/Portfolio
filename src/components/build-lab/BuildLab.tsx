@@ -11,7 +11,7 @@ export default function BuildLab({ onLaunch }: BuildLabProps) {
   return (
     <section
       id="build-lab"
-      className="relative py-24 px-4 sm:px-8 bg-mono-950 text-white border-t border-mono-900 overflow-hidden"
+      className="relative py-24 px-4 sm:px-8 bg-mono-950 text-white border-t border-mono-900 overflow-x-clip"
     >
       {/* Background Accent Grid */}
       <div className="absolute inset-0 bg-grid-pattern opacity-30 pointer-events-none" />
