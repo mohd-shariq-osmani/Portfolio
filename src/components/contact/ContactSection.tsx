@@ -4,10 +4,17 @@ export default function ContactSection() {
   return (
     <section
       id="contact"
-      className="relative py-28 px-4 sm:px-8 bg-black text-white border-t border-mono-900 overflow-hidden"
+      className="relative py-28 px-4 sm:px-8 bg-black text-white border-t border-mono-900 overflow-x-clip"
     >
-      {/* Glow background accent */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-mono-100/5 blur-[140px] rounded-full pointer-events-none z-0" />
+      {/* Glow background accent (pure radial gradient - zero offscreen blur texture) */}
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[760px] h-[360px] pointer-events-none z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at bottom center, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 45%, transparent 75%)",
+        }}
+      />
 
       <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
         {/* Badge */}

@@ -79,10 +79,10 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:pt-6">
       <nav
-        className={`flex items-center justify-between px-4 sm:px-6 py-2.5 rounded-full border transition-all duration-300 backdrop-blur-md ${
+        className={`flex items-center justify-between px-4 sm:px-6 py-2.5 rounded-full border transition-[max-width,background-color,border-color,box-shadow] duration-300 md:backdrop-blur-md ${
           scrolled
-            ? "bg-mono-950/90 border-mono-800 shadow-2xl shadow-black w-full max-w-4xl"
-            : "bg-mono-900/60 border-mono-800/70 w-full max-w-5xl"
+            ? "bg-mono-950/95 md:bg-mono-950/90 border-mono-800 shadow-2xl shadow-black w-full max-w-4xl"
+            : "bg-mono-950/90 md:bg-mono-900/60 border-mono-800/70 w-full max-w-5xl"
         }`}
       >
         {/* Brand / Logo */}
@@ -150,7 +150,7 @@ export default function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-20 left-4 right-4 bg-mono-950/95 border border-mono-800 rounded-2xl p-6 backdrop-blur-xl md:hidden shadow-2xl flex flex-col gap-4 z-50"
+            className="absolute top-20 left-4 right-4 bg-mono-950 border border-mono-800 rounded-2xl p-6 md:hidden shadow-2xl flex flex-col gap-4 z-50"
           >
             {NAV_ITEMS.map((item) => (
               <button

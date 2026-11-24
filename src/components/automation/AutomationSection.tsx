@@ -7,7 +7,7 @@ export default function AutomationSection() {
   return (
     <section
       id="automation"
-      className="relative py-24 px-4 sm:px-8 bg-black text-white border-t border-mono-900 overflow-x-hidden"
+      className="relative py-24 px-4 sm:px-8 bg-black text-white border-t border-mono-900 overflow-x-clip"
     >
       <div className="max-w-6xl mx-auto">
         {/* Header */}

@@ -131,7 +131,7 @@ export default function ProjectViewport({
         {activeMode === "live" && hasLiveFlutter ? (
           <div className="relative h-full w-full">
             {isLoading && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-mono-950/95 p-4 text-center backdrop-blur-sm">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-mono-950/95 p-4 text-center">
                 <Loader2 size={24} className="mb-2.5 animate-spin text-white" />
                 <span className="text-xs font-mono text-white">
                   Loading Flutter Engine...
@@ -163,7 +163,7 @@ export default function ProjectViewport({
         ) : activeMode === "live" && hasLiveVideo ? (
           <div className="relative flex h-full w-full items-center justify-center bg-black">
             {isLoading && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-mono-950/95 p-4 text-center backdrop-blur-sm">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-mono-950/95 p-4 text-center">
                 <Loader2 size={24} className="mb-2.5 animate-spin text-white" />
                 <span className="text-xs font-mono text-white">
                   Loading Demo Video...

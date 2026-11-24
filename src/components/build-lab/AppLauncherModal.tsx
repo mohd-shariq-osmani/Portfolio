@@ -147,7 +147,7 @@ export default function AppLauncherModal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={onClose}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-8 bg-black/95 backdrop-blur-2xl"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-8 bg-black/95"
         >
           {/* Header Bar */}
           <div
