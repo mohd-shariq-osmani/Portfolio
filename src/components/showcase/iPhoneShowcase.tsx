@@ -111,13 +111,18 @@ export default function IPhoneShowcase({ onLaunchBuildLab }: iPhoneShowcaseProps
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap items-center gap-4 pt-2">
-                  {onLaunchBuildLab && project.type === "flutter-web" && (
+                  {onLaunchBuildLab && (
                     <button
+                      type="button"
                       onClick={() => onLaunchBuildLab(project)}
-                      className="px-6 py-3 bg-white text-black font-semibold text-xs rounded-full hover:bg-mono-200 transition-all flex items-center gap-2 shadow-lg shadow-white/5"
+                      className="px-6 py-3 bg-white text-black font-semibold text-xs rounded-full hover:bg-mono-200 transition-all flex items-center gap-2 shadow-lg shadow-white/5 cursor-pointer"
                     >
                       <Play size={13} className="fill-black" />
-                      <span>Launch App in Lab</span>
+                      <span>
+                        {project.type === "flutter-web"
+                          ? "Launch App in Lab"
+                          : "Watch Demo in Lab"}
+                      </span>
                     </button>
                   )}
                   <a

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MousePointer2, Keyboard, Clipboard, Power, Laptop, CheckCircle2, Wifi } from "lucide-react";
 
 export default function RelayApp() {
@@ -10,14 +10,31 @@ export default function RelayApp() {
   const [clipboardContent, setClipboardContent] = useState("https://github.com/mohd-shariq-osmani/Relay");
   const [copiedStatus, setCopiedStatus] = useState(false);
 
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
+
   const triggerClick = (label: string) => {
     setClickFeedback(label);
-    setTimeout(() => setClickFeedback(null), 300);
+    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    feedbackTimerRef.current = setTimeout(() => setClickFeedback(null), 300);
   };
 
-  const handleCopyClipboard = () => {
+  const handleCopyClipboard = async () => {
+    try {
+      await navigator.clipboard?.writeText(clipboardContent);
+    } catch {
+      // Clipboard API may be blocked in restricted contexts
+    }
     setCopiedStatus(true);
-    setTimeout(() => setCopiedStatus(false), 1500);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedStatus(false), 1500);
   };
 
   return (
@@ -93,8 +110,10 @@ export default function RelayApp() {
         {activeMode === "trackpad" && (
           <div className="h-full flex flex-col justify-between gap-2.5">
             {/* Virtual Touch Surface */}
-            <div
+            <button
+              type="button"
               onClick={() => triggerClick("Left Click")}
+              aria-label="Virtual touchpad surface, activate to trigger left click"
               className="flex-1 bg-mono-900/60 border border-dashed border-mono-800 hover:border-mono-600 rounded-2xl flex flex-col items-center justify-center p-4 text-center cursor-pointer transition-all active:bg-mono-800/80"
             >
               <MousePointer2 size={24} className="text-mono-500 mb-2" />
@@ -102,7 +121,7 @@ export default function RelayApp() {
               <span className="text-[10px] text-mono-500 mt-1 font-mono">
                 {clickFeedback ? `Dispatched: ${clickFeedback}` : "Tap for Left Click • 2-Finger Scroll"}
               </span>
-            </div>
+            </button>
 
             {/* Click Hardware Buttons */}
             <div className="grid grid-cols-2 gap-2 h-14">

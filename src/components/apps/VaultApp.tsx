@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ShieldCheck, Lock, Eye, EyeOff, Copy, Key, Plus, Check, Fingerprint } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ShieldCheck, Lock, Eye, EyeOff, Copy, Plus, Check, Fingerprint } from "lucide-react";
 
 interface VaultItem {
   id: string;
@@ -13,9 +13,15 @@ interface VaultItem {
 
 export default function VaultApp() {
   const [unlocked, setUnlocked] = useState(false);
-  const [pin, setPin] = useState("");
   const [revealedIds, setRevealedIds] = useState<Record<string, boolean>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
 
   const [items, setItems] = useState<VaultItem[]>([
     {
@@ -57,9 +63,15 @@ export default function VaultApp() {
     setRevealedIds((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleCopy = (id: string, text: string) => {
+  const handleCopy = async (id: string, text: string) => {
+    try {
+      await navigator.clipboard?.writeText(text);
+    } catch {
+      // Clipboard API may be blocked in restricted contexts; still confirm visual action
+    }
     setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 1500);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedId(null), 1500);
   };
 
   const addItem = (e: React.FormEvent) => {
@@ -119,15 +131,19 @@ export default function VaultApp() {
 
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => setShowAddForm(!showAddForm)}
-            className="px-2.5 py-1 bg-white text-black text-xs font-bold rounded-lg hover:bg-mono-200 transition-colors flex items-center gap-1"
+            aria-label="Add encrypted vault entry"
+            className="px-2.5 py-1 bg-white text-black text-xs font-bold rounded-lg hover:bg-mono-200 transition-colors flex items-center gap-1 cursor-pointer"
           >
             <Plus size={12} />
             <span>Add</span>
           </button>
           <button
+            type="button"
             onClick={() => setUnlocked(false)}
-            className="p-1.5 text-mono-400 hover:text-white bg-black border border-mono-800 rounded-lg"
+            aria-label="Lock Vault"
+            className="p-1.5 text-mono-400 hover:text-white bg-black border border-mono-800 rounded-lg cursor-pointer"
             title="Lock Vault"
           >
             <Lock size={12} />
@@ -210,14 +226,18 @@ export default function VaultApp() {
 
                 <div className="flex items-center gap-1 shrink-0">
                   <button
+                    type="button"
                     onClick={() => toggleReveal(item.id)}
-                    className="p-1 text-mono-400 hover:text-white transition-colors"
+                    aria-label={isRevealed ? `Hide ${item.service} secret` : `Reveal ${item.service} secret`}
+                    className="p-1 text-mono-400 hover:text-white transition-colors cursor-pointer"
                   >
                     {isRevealed ? <EyeOff size={12} /> : <Eye size={12} />}
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleCopy(item.id, item.secret)}
-                    className="p-1 text-mono-400 hover:text-white transition-colors"
+                    aria-label={`Copy ${item.service} secret`}
+                    className="p-1 text-mono-400 hover:text-white transition-colors cursor-pointer"
                   >
                     {isCopied ? <Check size={12} className="text-white" /> : <Copy size={12} />}
                   </button>

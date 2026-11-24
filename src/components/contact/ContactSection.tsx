@@ -18,7 +18,7 @@ export default function ContactSection() {
 
         {/* Heading */}
         <h2 className="text-4xl sm:text-6xl font-black tracking-tight uppercase font-display mb-6 text-white">
-          Let's Build <br />
+          Let&apos;s Build <br />
           <span className="text-mono-400">Something Exceptional</span>
         </h2>
 

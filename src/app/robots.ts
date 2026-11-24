@@ -5,7 +5,6 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/apps/repos/"],
     },
     sitemap: "https://shariqosmani.xyz/sitemap.xml",
   };
