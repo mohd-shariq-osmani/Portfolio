@@ -1,6 +1,7 @@
 "use client";
 
 import WorkflowCanvas from "./WorkflowCanvas";
+import { Reveal } from "@/components/motion/Reveal";
 import { ArrowUpRight, Github, Network } from "lucide-react";
 
 export default function AutomationSection() {
@@ -11,7 +12,7 @@ export default function AutomationSection() {
     >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col items-center text-center mb-12">
+        <Reveal className="flex flex-col items-center text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-mono-950 border border-mono-800 text-xs font-mono text-mono-400 mb-4">
             <Network size={14} />
             <span>n8n Production Pipelines</span>
@@ -22,26 +23,26 @@ export default function AutomationSection() {
           <p className="text-sm sm:text-base text-mono-400 max-w-xl font-light">
             Real-time visual node execution canvas modeling intelligent webhooks, AI agent reasoning, and multi-platform content routing.
           </p>
-        </div>
+        </Reveal>
 
         {/* Real n8n Visual Workflow Canvas */}
-        <div>
+        <Reveal delay={0.08}>
           <WorkflowCanvas />
-        </div>
+        </Reveal>
 
         {/* GitHub Workflows Repo Footer */}
-        <div className="flex justify-center mt-10">
+        <Reveal delay={0.12} className="flex justify-center mt-10">
           <a
             href="https://github.com/mohd-shariq-osmani/n8n-workflows"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-mono-950 border border-mono-800 hover:border-mono-600 rounded-full text-xs font-mono text-mono-300 hover:text-white transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-mono-950 border border-mono-800 hover:border-mono-600 rounded-full text-xs font-mono text-mono-300 hover:text-white transition-all hover:-translate-y-0.5 cursor-pointer"
           >
             <Github size={15} />
             <span>Explore All n8n Automation Workflows on GitHub</span>
             <ArrowUpRight size={14} />
           </a>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

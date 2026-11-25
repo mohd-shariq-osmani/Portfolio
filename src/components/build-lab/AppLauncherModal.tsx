@@ -2,29 +2,41 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Github, RefreshCw, Smartphone, X } from "lucide-react";
-import { Project } from "@/data/projects";
+import { ArrowUpRight, Github, Monitor, RefreshCw, Smartphone, X } from "lucide-react";
+import { Project, ProjectRoute } from "@/data/projects";
 import ProjectViewport, {
   PreviewMode,
   isTouchViewport,
 } from "@/components/showcase/ProjectViewport";
+import DesktopBrowserViewport from "@/components/showcase/DesktopBrowserViewport";
 import { pauseLenis, resumeLenis } from "@/lib/smoothScroll";
 
 interface AppLauncherModalProps {
   project: Project | null;
+  initialRoute?: ProjectRoute;
   onClose: () => void;
 }
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+const DEFAULT_ROUTE: ProjectRoute = {
+  id: "dashboard",
+  label: "Dashboard",
+  path: "/dashboard",
+  summary: "Live workspace overview.",
+};
+
 export default function AppLauncherModal({
   project,
+  initialRoute,
   onClose,
 }: AppLauncherModalProps) {
   const [reloadNonce, setReloadNonce] = useState(0);
   const [mode, setMode] = useState<PreviewMode>("sim");
   const [isLoading, setIsLoading] = useState(false);
+  const [activeRoute, setActiveRoute] = useState<ProjectRoute>(DEFAULT_ROUTE);
+  const [isDesktopBooted, setIsDesktopBooted] = useState(true);
 
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -33,9 +45,19 @@ export default function AppLauncherModal({
   onCloseRef.current = onClose;
 
   const isOpen = Boolean(project);
+  const isDesktopProject =
+    project?.formFactor === "desktop" || project?.type === "web-app";
 
   useEffect(() => {
     if (!project) return;
+
+    if (project.formFactor === "desktop" || project.type === "web-app") {
+      const nextRoute = initialRoute ?? project.routes?.[0] ?? DEFAULT_ROUTE;
+      setActiveRoute(nextRoute);
+      setIsDesktopBooted(true);
+      setReloadNonce(0);
+      return;
+    }
 
     const hasLiveMedia =
       (project.type === "flutter-web" && Boolean(project.demoUrl)) ||
@@ -48,7 +70,7 @@ export default function AppLauncherModal({
     setMode(initialMode);
     setIsLoading(initialMode === "live");
     setReloadNonce(0);
-  }, [project]);
+  }, [project, initialRoute]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -133,6 +155,10 @@ export default function AppLauncherModal({
         : "Switch to Web"
       : "Switch to Sim";
 
+  const externalWebUrl = project?.demoUrl
+    ? `${project.demoUrl.replace(/\/$/, "")}${activeRoute.path}`
+    : undefined;
+
   return (
     <AnimatePresence>
       {project && (
@@ -156,7 +182,7 @@ export default function AppLauncherModal({
           >
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-mono-900 border border-mono-700 flex items-center justify-center text-white shrink-0">
-                <Smartphone size={18} />
+                {isDesktopProject ? <Monitor size={18} /> : <Smartphone size={18} />}
               </div>
               <div>
                 <h3
@@ -166,13 +192,20 @@ export default function AppLauncherModal({
                   {project.title}
                 </h3>
                 <p className="text-[10px] sm:text-[11px] font-mono text-mono-400">
-                  Build Lab • {mode === "live" ? (project.type === "video" ? "Demo Video" : "Flutter Web") : "Interactive Sim"}
+                  Build Lab •{" "}
+                  {isDesktopProject
+                    ? `Live Web Workspace (${activeRoute.label})`
+                    : mode === "live"
+                      ? project.type === "video"
+                        ? "Demo Video"
+                        : "Flutter Web"
+                      : "Interactive Sim"}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              {hasLiveMedia && (
+              {!isDesktopProject && hasLiveMedia && (
                 <button
                   type="button"
                   onClick={() =>
@@ -182,6 +215,17 @@ export default function AppLauncherModal({
                 >
                   {switchButtonLabel}
                 </button>
+              )}
+              {isDesktopProject && externalWebUrl && (
+                <a
+                  href={externalWebUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-mono-300 hover:text-white bg-mono-900 border border-mono-800 rounded-full text-xs font-mono transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                >
+                  <span>Open Fullscreen</span>
+                  <ArrowUpRight size={13} />
+                </a>
               )}
               <button
                 type="button"
@@ -215,38 +259,65 @@ export default function AppLauncherModal({
             </div>
           </div>
 
-          {/* Expanded Phone Hardware Frame */}
-          <motion.div
-            onClick={(e) => e.stopPropagation()}
-            initial={{ scale: 0.9, y: 24, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.9, y: 24, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            className="relative w-full max-w-[390px] sm:max-w-[430px] h-[82dvh] max-h-[calc(100dvh-5rem)] sm:h-[82vh] sm:max-h-[820px] bg-mono-950 border-[12px] border-mono-800 rounded-[56px] shadow-2xl shadow-black p-3 flex flex-col items-center justify-between"
-          >
-            {/* Dynamic Island Notch */}
-            <div className="pointer-events-none absolute top-5 z-30 w-28 h-6 bg-black rounded-full flex items-center justify-end px-3 gap-2 border border-mono-850">
-              <div className="w-3 h-3 rounded-full bg-mono-900 border border-mono-700" />
-              <div className="w-2 h-2 rounded-full bg-mono-800" />
-            </div>
-
-            {/* Screen Content Viewport */}
-            <div className="relative w-full h-full bg-black rounded-[42px] overflow-hidden flex flex-col pt-9 pb-3 border border-mono-900">
-              <ProjectViewport
+          {isDesktopProject ? (
+            /* Expanded Desktop Browser Window */
+            <motion.div
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.94, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.94, y: 20, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 30 }}
+              className="mt-12 sm:mt-14 w-full max-w-[1280px] h-[82dvh] max-h-[calc(100dvh-5.5rem)]"
+            >
+              <DesktopBrowserViewport
                 project={project}
-                mode={mode}
-                onModeChange={handleModeChange}
+                activeRoute={activeRoute}
+                onRouteChange={setActiveRoute}
+                isBooted={isDesktopBooted}
+                onBoot={(route) => {
+                  if (route) setActiveRoute(route);
+                  setIsDesktopBooted(true);
+                }}
+                onExitToPreview={() => setIsDesktopBooted(false)}
                 reloadNonce={reloadNonce}
                 onReload={handleReload}
-                isLoading={isLoading}
-                onLoaded={handleLoaded}
-                onLoadError={handleLoadError}
+                className="h-full"
               />
-            </div>
+            </motion.div>
+          ) : (
+            /* Expanded Phone Hardware Frame */
+            <motion.div
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.9, y: 24, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 24, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+              className="relative w-full max-w-[390px] sm:max-w-[430px] h-[82dvh] max-h-[calc(100dvh-5rem)] sm:h-[82vh] sm:max-h-[820px] bg-mono-950 border-[12px] border-mono-800 rounded-[56px] shadow-2xl shadow-black p-3 flex flex-col items-center justify-between"
+            >
+              {/* Dynamic Island Notch */}
+              <div className="pointer-events-none absolute top-5 z-30 w-28 h-6 bg-black rounded-full flex items-center justify-end px-3 gap-2 border border-mono-850">
+                <div className="w-3 h-3 rounded-full bg-mono-900 border border-mono-700" />
+                <div className="w-2 h-2 rounded-full bg-mono-800" />
+              </div>
 
-            {/* Home Bar */}
-            <div className="pointer-events-none absolute bottom-4 z-30 w-36 h-1 bg-mono-500 rounded-full" />
-          </motion.div>
+              {/* Screen Content Viewport */}
+              <div className="relative w-full h-full bg-black rounded-[42px] overflow-hidden flex flex-col pt-9 pb-3 border border-mono-900">
+                <ProjectViewport
+                  project={project}
+                  mode={mode}
+                  onModeChange={handleModeChange}
+                  reloadNonce={reloadNonce}
+                  onReload={handleReload}
+                  isLoading={isLoading}
+                  onLoaded={handleLoaded}
+                  onLoadError={handleLoadError}
+                />
+              </div>
+
+              {/* Home Bar */}
+              <div className="pointer-events-none absolute bottom-4 z-30 w-36 h-1 bg-mono-500 rounded-full" />
+            </motion.div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

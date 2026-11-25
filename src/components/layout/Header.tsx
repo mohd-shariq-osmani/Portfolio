@@ -111,12 +111,20 @@ export default function Header() {
             return (
               <button
                 key={item.label}
+                type="button"
                 onClick={() => scrollToSection(item.href)}
                 className={`relative px-3.5 py-1.5 text-xs font-medium tracking-wider uppercase transition-colors rounded-full cursor-pointer ${
-                  isActive ? "text-white bg-mono-800" : "text-mono-400 hover:text-white"
+                  isActive ? "text-white" : "text-mono-400 hover:text-white"
                 }`}
               >
-                {item.label}
+                {isActive && (
+                  <motion.span
+                    layoutId="header-nav-active-pill"
+                    transition={{ type: "spring", stiffness: 360, damping: 32 }}
+                    className="absolute inset-0 rounded-full bg-mono-800"
+                  />
+                )}
+                <span className="relative z-10">{item.label}</span>
               </button>
             );
           })}
