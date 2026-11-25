@@ -45,8 +45,8 @@ export default function IPhoneFrame({ project, onLaunchBuildLab }: IPhoneFramePr
 
   return (
     <div className="relative group flex flex-col items-center">
-      {/* iPhone hardware shell: a stable 9:19.5 ratio keeps the frame natural at every breakpoint. */}
-      <div className="relative w-[min(78vw,300px)] sm:w-[300px] aspect-[9/19.5] rounded-[46px] bg-gradient-to-br from-[#52525b] via-[#27272a] to-[#09090b] p-2 shadow-[0_28px_70px_rgba(0,0,0,0.65),0_0_0_1px_rgba(255,255,255,0.12)] transition-transform duration-500 group-hover:-translate-y-1">
+      {/* iPhone hardware shell: explicit dimensions lock realistic 9:19.5 proportions so inner flex content scrolls instead of stretching the frame. */}
+      <div className="relative h-[584px] w-[286px] sm:h-[612px] sm:w-[300px] shrink-0 rounded-[46px] bg-gradient-to-br from-[#52525b] via-[#27272a] to-[#09090b] p-2 shadow-[0_28px_70px_rgba(0,0,0,0.65),0_0_0_1px_rgba(255,255,255,0.12)] transition-transform duration-500 group-hover:-translate-y-1">
         {/* Side hardware buttons */}
         <div className="absolute -left-[5px] top-[23%] h-12 w-1 rounded-l-full bg-[#52525b] shadow-[0_0_0_1px_rgba(0,0,0,0.6)]" />
         <div className="absolute -left-[5px] top-[33%] h-12 w-1 rounded-l-full bg-[#52525b] shadow-[0_0_0_1px_rgba(0,0,0,0.6)]" />
@@ -60,7 +60,7 @@ export default function IPhoneFrame({ project, onLaunchBuildLab }: IPhoneFramePr
             <div className="h-2 w-2 rounded-full bg-mono-800" />
           </div>
 
-          <div className="relative flex h-full w-full flex-col bg-black pb-4 pt-10">
+          <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden bg-black pb-4 pt-10">
             <ProjectViewport
               project={project}
               mode={mode}

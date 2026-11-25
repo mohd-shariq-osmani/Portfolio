@@ -582,7 +582,7 @@ export default function VaultApp() {
       </div>
 
       {/* Encrypted Document Cards List */}
-      <div className="flex-1 overflow-y-auto px-3.5 pb-16 flex flex-col gap-2.5">
+      <div className="flex-1 min-h-0 overflow-y-auto px-3.5 pb-16 flex flex-col gap-2">
         {filteredDocs.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#8A8F98]">
             <Lock size={24} className="mb-2 opacity-60" />
@@ -602,7 +602,7 @@ export default function VaultApp() {
                   setSelectedDocId(doc.id);
                   setRevealed(false);
                 }}
-                className="w-full text-left rounded-2xl p-3.5 border border-white/10 hover:border-white/25 transition-all cursor-pointer shrink-0"
+                className="w-full text-left rounded-2xl p-3 border border-white/10 hover:border-white/25 transition-all cursor-pointer shrink-0"
                 style={{ background: theme.gradient }}
               >
                 <div className="flex items-center justify-between">
@@ -616,17 +616,17 @@ export default function VaultApp() {
                   >
                     {doc.badge}
                   </span>
-                  {getDocIcon(doc.type, theme.accent, 16)}
+                  {getDocIcon(doc.type, theme.accent, 15)}
                 </div>
 
-                <h3 className="text-sm font-bold text-[#EDEDEF] mt-2.5">
+                <h3 className="text-[13px] font-bold text-[#EDEDEF] mt-1.5">
                   {doc.title}
                 </h3>
-                <p className="font-mono text-xs text-[#D0D4DC] tracking-wider mt-1">
+                <p className="font-mono text-[11px] text-[#D0D4DC] tracking-wider mt-0.5">
                   {getMaskedNumber(doc)}
                 </p>
 
-                <div className="flex items-end justify-between mt-3">
+                <div className="flex items-end justify-between mt-2">
                   <div>
                     <span className="text-[8px] font-semibold tracking-widest text-white/50 block">
                       NAME
