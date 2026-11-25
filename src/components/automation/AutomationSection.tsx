@@ -8,7 +8,7 @@ export default function AutomationSection() {
   return (
     <section
       id="automation"
-      className="relative py-24 px-4 sm:px-8 bg-black text-white border-t border-mono-900 overflow-x-clip"
+      className="relative py-16 sm:py-24 px-4 sm:px-8 bg-black text-white border-t border-mono-900 overflow-x-clip"
     >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
@@ -21,7 +21,7 @@ export default function AutomationSection() {
             Automation Systems
           </h2>
           <p className="text-sm sm:text-base text-mono-400 max-w-xl font-light">
-            Real-time visual node execution canvas modeling intelligent webhooks, AI agent reasoning, and multi-platform content routing.
+            Interactive n8n canvas running the 25-node Discord AI Multi-Agent Router, Daily Digest, and Error Alerting flows.
           </p>
         </Reveal>
 

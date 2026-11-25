@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowUpRight,
-  Database,
-  Globe,
   Loader2,
   Lock,
   Maximize2,
@@ -28,13 +26,6 @@ interface DesktopBrowserViewportProps {
   onExpand?: () => void;
   className?: string;
 }
-
-const ARCHITECTURE_STEPS = [
-  { label: "UI Layer", detail: "Next.js 16 + TanStack Query" },
-  { label: "API Client", detail: "Typed fetch + Zod v4" },
-  { label: "Local Store", detail: "MSW v3 + Dexie IndexedDB" },
-  { label: "Orbit AI", detail: "/api/ai/* Function Calling" },
-];
 
 export default function DesktopBrowserViewport({
   project,
@@ -205,47 +196,31 @@ export default function DesktopBrowserViewport({
             >
               <div className="absolute inset-0 bg-grid-pattern opacity-25 pointer-events-none" />
 
-              <div className="relative z-10 flex flex-col gap-6 my-auto max-w-4xl mx-auto w-full">
-                {/* Launch Banner */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 rounded-2xl border border-mono-850 bg-mono-950/95 p-5 sm:p-6">
-                  <div className="max-w-xl">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-mono-800 bg-black px-3 py-1 text-[10px] font-mono text-mono-300 mb-3">
-                      <Database size={11} />
-                      <span>Zero-Signup Demo · IndexedDB + MSW v3 + Orbit AI</span>
-                    </div>
-                    <h4 className="text-xl sm:text-2xl font-bold font-display text-white">
-                      Interactive CRM Preview — {activeRoute.label}
-                    </h4>
-                    <p className="mt-1.5 text-xs sm:text-sm text-mono-400 font-light leading-relaxed">
-                      {activeRoute.summary}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => onBoot(activeRoute)}
-                      className="px-5 py-2.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-mono-200 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-2 shadow-lg cursor-pointer"
-                    >
-                      <Play size={13} className="fill-black" />
-                      <span>Boot Live CRM</span>
-                    </button>
-                    <a
-                      href={fullUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-4 py-2.5 rounded-full border border-mono-800 bg-black text-mono-300 hover:text-white hover:border-mono-600 text-xs font-mono transition-colors inline-flex items-center gap-1.5"
-                    >
-                      <Globe size={13} />
-                      <span>Open Fullscreen</span>
-                      <ArrowUpRight size={12} />
-                    </a>
-                  </div>
+              <div className="relative z-10 flex flex-col items-center text-center gap-6 my-auto max-w-2xl mx-auto w-full">
+                {/* Concise Launch Card */}
+                <div className="flex flex-col items-center gap-4">
+                  <span className="px-3 py-1 rounded-full border border-mono-800 bg-mono-950 text-[11px] font-mono text-mono-400">
+                    Zero-Signup Sandbox · {activeRoute.path}
+                  </span>
+                  <h4 className="text-2xl sm:text-3xl font-bold font-display text-white">
+                    {project.title} — {activeRoute.label}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-mono-400 font-light max-w-md">
+                    {activeRoute.summary}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => onBoot(activeRoute)}
+                    className="mt-1 px-6 py-3 rounded-full bg-white text-black text-xs font-semibold hover:bg-mono-200 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-2 shadow-lg cursor-pointer"
+                  >
+                    <Play size={13} className="fill-black" />
+                    <span>Boot Live Workspace</span>
+                  </button>
                 </div>
 
-                {/* Click-to-boot Route Cards */}
+                {/* Compact Route Pills */}
                 {routes.length > 0 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
                     {routes.map((route) => {
                       const active = route.id === activeRoute.id;
                       return (
@@ -256,48 +231,24 @@ export default function DesktopBrowserViewport({
                             onRouteChange(route);
                             onBoot(route);
                           }}
-                          className={`group text-left rounded-xl border p-3.5 transition-all cursor-pointer ${
+                          className={`group flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-mono transition-all cursor-pointer ${
                             active
-                              ? "border-mono-600 bg-mono-900"
-                              : "border-mono-850 bg-mono-950/90 hover:border-mono-700 hover:bg-mono-900/70"
+                              ? "border-mono-500 bg-mono-900 text-white"
+                              : "border-mono-850 bg-mono-950/90 text-mono-400 hover:border-mono-700 hover:text-white"
                           }`}
                         >
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-xs font-bold text-white font-display flex items-center gap-1.5">
-                              {route.id === "assistant" && (
-                                <Sparkles size={12} className="text-mono-300" />
-                              )}
-                              {route.label}
-                            </span>
-                            <span className="text-[10px] font-mono text-mono-500 group-hover:text-white transition-colors">
-                              {route.path} →
-                            </span>
-                          </div>
-                          <p className="mt-1.5 text-[11px] text-mono-400 font-light line-clamp-2">
-                            {route.summary}
-                          </p>
+                          {route.id === "assistant" && (
+                            <Sparkles size={12} className="text-mono-300" />
+                          )}
+                          <span>{route.label}</span>
+                          <span className="text-[10px] text-mono-600 group-hover:text-mono-400">
+                            {route.path}
+                          </span>
                         </button>
                       );
                     })}
                   </div>
                 )}
-
-                {/* Architecture Flow Strip */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {ARCHITECTURE_STEPS.map((step, index) => (
-                    <div
-                      key={step.label}
-                      className="rounded-xl border border-mono-900 bg-mono-950/80 px-3 py-2.5"
-                    >
-                      <span className="text-[10px] font-mono text-mono-500">
-                        0{index + 1} · {step.label}
-                      </span>
-                      <div className="text-[11px] font-mono text-mono-200 mt-0.5 truncate">
-                        {step.detail}
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             </motion.div>
           ) : (

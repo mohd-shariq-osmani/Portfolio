@@ -29,7 +29,7 @@ export function Reveal({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: "some" }}
       transition={{ duration, delay, ease: EASE_OUT_EXPO }}
-      className={className}
+      className={className ? `reveal-motion ${className}` : "reveal-motion"}
     >
       {children}
     </motion.div>
@@ -60,7 +60,7 @@ export function StaggerList({
           },
         },
       }}
-      className={className}
+      className={className ? `reveal-motion ${className}` : "reveal-motion"}
     >
       {children}
     </motion.div>
@@ -84,7 +84,7 @@ export function StaggerItem({ children, className, y = 14 }: StaggerItemProps) {
           transition: { duration: 0.45, ease: EASE_OUT_EXPO },
         },
       }}
-      className={className}
+      className={className ? `reveal-motion ${className}` : "reveal-motion"}
     >
       {children}
     </motion.div>
