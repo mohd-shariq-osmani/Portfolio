@@ -295,7 +295,7 @@ export default function AppLauncherModal({
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.9, y: 24, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                className="relative w-full max-w-[380px] sm:max-w-[420px] h-full max-h-[780px] bg-mono-950 border-[10px] sm:border-[12px] border-mono-800 rounded-[48px] sm:rounded-[56px] shadow-2xl shadow-black p-2.5 sm:p-3 flex flex-col items-center justify-between"
+                className="relative h-[min(78dvh,720px)] aspect-[9/19.2] max-w-[90vw] bg-mono-950 border-[10px] sm:border-[12px] border-mono-800 rounded-[48px] sm:rounded-[56px] shadow-2xl shadow-black p-2.5 sm:p-3 flex flex-col items-center justify-between overflow-hidden"
               >
                 {/* Dynamic Island Notch */}
                 <div className="pointer-events-none absolute top-4 sm:top-5 z-30 w-24 sm:w-28 h-5 sm:h-6 bg-black rounded-full flex items-center justify-end px-3 gap-2 border border-mono-850">
@@ -304,7 +304,7 @@ export default function AppLauncherModal({
                 </div>
 
                 {/* Screen Content Viewport */}
-                <div className="relative w-full h-full bg-black rounded-[38px] sm:rounded-[42px] overflow-hidden flex flex-col pt-8 sm:pt-9 pb-3 border border-mono-900">
+                <div className="relative w-full h-full min-h-0 bg-black rounded-[38px] sm:rounded-[42px] overflow-hidden flex flex-col pt-8 sm:pt-9 pb-3 border border-mono-900">
                   <ProjectViewport
                     project={project}
                     mode={mode}
