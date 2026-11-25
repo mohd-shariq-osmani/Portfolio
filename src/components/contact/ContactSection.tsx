@@ -5,7 +5,7 @@ export default function ContactSection() {
   return (
     <section
       id="contact"
-      className="relative py-28 px-4 sm:px-8 bg-black text-white border-t border-mono-900 overflow-x-clip"
+      className="relative py-16 sm:py-28 px-4 sm:px-8 bg-black text-white border-t border-mono-900 overflow-x-clip"
     >
       {/* Glow background accent (pure radial gradient - zero offscreen blur texture) */}
       <div
@@ -38,11 +38,11 @@ export default function ContactSection() {
           {/* Main Email Action */}
           <a
             href="mailto:mohdshariqosmani@gmail.com"
-            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-bold text-sm sm:text-base rounded-full hover:bg-mono-200 transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl shadow-white/10 mb-16"
+            className="group relative inline-flex items-center justify-center gap-2.5 sm:gap-3 px-5 sm:px-8 py-3.5 sm:py-4 bg-white text-black font-bold text-xs sm:text-base rounded-full hover:bg-mono-200 transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl shadow-white/10 mb-10 sm:mb-16 max-w-full"
           >
-            <Mail size={18} className="fill-black" />
-            <span>mohdshariqosmani@gmail.com</span>
-            <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+            <Mail size={16} className="fill-black shrink-0" />
+            <span className="truncate">mohdshariqosmani@gmail.com</span>
+            <ArrowUpRight size={16} className="shrink-0 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
           </a>
         </Reveal>
 

@@ -1,44 +1,35 @@
 import { TECH_STACK } from "@/data/techStack";
-import { StaggerItem, StaggerList } from "@/components/motion/Reveal";
+import { Reveal } from "@/components/motion/Reveal";
 
 export default function TechGrid() {
   return (
-    <div className="w-full">
-      <StaggerList className="grid grid-cols-1 md:grid-cols-2 gap-6" stagger={0.07}>
+    <Reveal delay={0.05} className="w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
         {TECH_STACK.map((cat) => (
-          <StaggerItem key={cat.category}>
-            <div className="h-full p-6 bg-mono-950 md:bg-mono-950/80 border border-mono-850 hover:border-mono-700 rounded-2xl transition-all duration-300 md:backdrop-blur-md group hover:-translate-y-0.5">
-              <h4 className="text-xs font-mono uppercase tracking-wider text-mono-400 mb-4 pb-2 border-b border-mono-900 flex items-center justify-between">
-                <span>{cat.category}</span>
-                <span className="text-[10px] text-mono-500">
-                  {cat.skills.length} Capabilities
-                </span>
-              </h4>
+          <div
+            key={cat.category}
+            className="p-5 bg-mono-950 md:bg-mono-950/80 border border-mono-850 hover:border-mono-700 rounded-2xl transition-colors duration-300 md:backdrop-blur-md"
+          >
+            <h4 className="text-xs font-mono uppercase tracking-wider text-white mb-1">
+              {cat.category}
+            </h4>
+            <p className="text-xs text-mono-400 font-light mb-3.5">
+              {cat.summary}
+            </p>
 
-              <div className="flex flex-col gap-3.5">
-                {cat.skills.map((skill) => (
-                  <div
-                    key={skill.name}
-                    className="flex flex-col p-2.5 rounded-xl bg-black/40 border border-mono-900 group-hover:border-mono-800 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-white font-display">
-                        {skill.name}
-                      </span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-mono-900 text-mono-400 border border-mono-800">
-                        {skill.level}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-mono-400 font-light mt-1">
-                      {skill.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-1.5">
+              {cat.skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="px-2.5 py-1 rounded-lg bg-black/70 border border-mono-850 text-[11px] font-mono text-mono-200"
+                >
+                  {skill}
+                </span>
+              ))}
             </div>
-          </StaggerItem>
+          </div>
         ))}
-      </StaggerList>
-    </div>
+      </div>
+    </Reveal>
   );
 }

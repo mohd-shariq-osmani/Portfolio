@@ -63,9 +63,11 @@ export default function AppLauncherModal({
       (project.type === "flutter-web" && Boolean(project.demoUrl)) ||
       (project.type === "video" && Boolean(project.videoUrl));
 
-    // On mobile touch devices, default to instant simulator to avoid heavy WebGL/WASM memory pressure
+    // On mobile touch devices or for Vault (which showcases pre-seeded dummy IDs in Sim Mode), default to simulator
     const initialMode: PreviewMode =
-      !isTouchViewport() && hasLiveMedia ? "live" : "sim";
+      project.id !== "vault" && !isTouchViewport() && hasLiveMedia
+        ? "live"
+        : "sim";
 
     setMode(initialMode);
     setIsLoading(initialMode === "live");
@@ -173,12 +175,12 @@ export default function AppLauncherModal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={onClose}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-8 bg-black/95"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-between gap-3 p-3 sm:p-6 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-black/95"
         >
-          {/* Header Bar */}
+          {/* Header Bar (in-flow so it never collides with hardware frame on short phones) */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between z-30 pt-[env(safe-area-inset-top)]"
+            className="w-full max-w-[1280px] flex items-center justify-between gap-2 z-30 shrink-0"
           >
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-mono-900 border border-mono-700 flex items-center justify-center text-white shrink-0">
@@ -267,7 +269,7 @@ export default function AppLauncherModal({
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.94, y: 20, opacity: 0 }}
               transition={{ type: "spring", stiffness: 320, damping: 30 }}
-              className="mt-12 sm:mt-14 w-full max-w-[1280px] h-[82dvh] max-h-[calc(100dvh-5.5rem)]"
+              className="min-h-0 flex-1 w-full max-w-[1280px] flex items-center justify-center"
             >
               <DesktopBrowserViewport
                 project={project}
@@ -281,42 +283,44 @@ export default function AppLauncherModal({
                 onExitToPreview={() => setIsDesktopBooted(false)}
                 reloadNonce={reloadNonce}
                 onReload={handleReload}
-                className="h-full"
+                className="h-full max-h-[820px]"
               />
             </motion.div>
           ) : (
             /* Expanded Phone Hardware Frame */
-            <motion.div
-              onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.9, y: 24, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 24, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 350, damping: 30 }}
-              className="relative w-full max-w-[390px] sm:max-w-[430px] h-[82dvh] max-h-[calc(100dvh-5rem)] sm:h-[82vh] sm:max-h-[820px] bg-mono-950 border-[12px] border-mono-800 rounded-[56px] shadow-2xl shadow-black p-3 flex flex-col items-center justify-between"
-            >
-              {/* Dynamic Island Notch */}
-              <div className="pointer-events-none absolute top-5 z-30 w-28 h-6 bg-black rounded-full flex items-center justify-end px-3 gap-2 border border-mono-850">
-                <div className="w-3 h-3 rounded-full bg-mono-900 border border-mono-700" />
-                <div className="w-2 h-2 rounded-full bg-mono-800" />
-              </div>
+            <div className="min-h-0 flex-1 w-full flex items-center justify-center">
+              <motion.div
+                onClick={(e) => e.stopPropagation()}
+                initial={{ scale: 0.9, y: 24, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.9, y: 24, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                className="relative w-full max-w-[380px] sm:max-w-[420px] h-full max-h-[780px] bg-mono-950 border-[10px] sm:border-[12px] border-mono-800 rounded-[48px] sm:rounded-[56px] shadow-2xl shadow-black p-2.5 sm:p-3 flex flex-col items-center justify-between"
+              >
+                {/* Dynamic Island Notch */}
+                <div className="pointer-events-none absolute top-4 sm:top-5 z-30 w-24 sm:w-28 h-5 sm:h-6 bg-black rounded-full flex items-center justify-end px-3 gap-2 border border-mono-850">
+                  <div className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-mono-900 border border-mono-700" />
+                  <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-mono-800" />
+                </div>
 
-              {/* Screen Content Viewport */}
-              <div className="relative w-full h-full bg-black rounded-[42px] overflow-hidden flex flex-col pt-9 pb-3 border border-mono-900">
-                <ProjectViewport
-                  project={project}
-                  mode={mode}
-                  onModeChange={handleModeChange}
-                  reloadNonce={reloadNonce}
-                  onReload={handleReload}
-                  isLoading={isLoading}
-                  onLoaded={handleLoaded}
-                  onLoadError={handleLoadError}
-                />
-              </div>
+                {/* Screen Content Viewport */}
+                <div className="relative w-full h-full bg-black rounded-[38px] sm:rounded-[42px] overflow-hidden flex flex-col pt-8 sm:pt-9 pb-3 border border-mono-900">
+                  <ProjectViewport
+                    project={project}
+                    mode={mode}
+                    onModeChange={handleModeChange}
+                    reloadNonce={reloadNonce}
+                    onReload={handleReload}
+                    isLoading={isLoading}
+                    onLoaded={handleLoaded}
+                    onLoadError={handleLoadError}
+                  />
+                </div>
 
-              {/* Home Bar */}
-              <div className="pointer-events-none absolute bottom-4 z-30 w-36 h-1 bg-mono-500 rounded-full" />
-            </motion.div>
+                {/* Home Bar */}
+                <div className="pointer-events-none absolute bottom-3.5 sm:bottom-4 z-30 w-32 sm:w-36 h-1 bg-mono-500 rounded-full" />
+              </motion.div>
+            </div>
           )}
         </motion.div>
       )}

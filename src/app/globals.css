@@ -226,7 +226,8 @@ html.lenis, html.lenis-smooth {
   .animate-hero-roles,
   .animate-hero-subtitle,
   .animate-hero-cta,
-  .animate-hero-scroll {
+  .animate-hero-scroll,
+  .reveal-motion {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

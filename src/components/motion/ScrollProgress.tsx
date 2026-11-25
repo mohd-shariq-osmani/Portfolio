@@ -1,11 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 
-/**
- * Hairline monochrome scroll progress bar pinned to the top edge of the viewport.
- */
-export default function ScrollProgress() {
+function DesktopScrollProgressBar() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 240,
@@ -24,4 +22,23 @@ export default function ScrollProgress() {
       />
     </div>
   );
+}
+
+/**
+ * Hairline monochrome scroll progress bar rendered on desktop viewports only
+ * to avoid continuous scroll-spring work and notch overlap on iOS/mobile.
+ */
+export default function ScrollProgress() {
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 768px) and (pointer: fine)");
+    const update = () => setIsDesktop(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  if (!isDesktop) return null;
+  return <DesktopScrollProgressBar />;
 }
