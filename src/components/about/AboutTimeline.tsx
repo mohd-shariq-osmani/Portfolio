@@ -1,3 +1,5 @@
+import { Reveal, StaggerItem, StaggerList } from "@/components/motion/Reveal";
+
 const MILESTONES = [
   {
     year: "2025 - Present",
@@ -19,22 +21,22 @@ export default function AboutTimeline() {
   return (
     <div className="w-full">
       <div className="flex flex-col gap-8">
-        <div>
+        <Reveal>
           <span className="text-xs font-mono uppercase tracking-widest text-mono-400">
             Professional Trajectory
           </span>
           <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-1 font-display">
-            Experience & Engineering Focus
+            Experience &amp; Engineering Focus
           </h3>
           <p className="text-sm text-mono-300 font-light leading-relaxed mt-3 max-w-2xl">
             Specializing in workflow automation, robotic process automation (RPA), and full-stack software development. Dedicated to building reliable, maintainable systems that eliminate manual overhead and improve business operations.
           </p>
-        </div>
+        </Reveal>
 
         {/* Vertical Timeline */}
-        <div className="relative pl-6 border-l border-mono-800 flex flex-col gap-8 my-4">
+        <StaggerList className="relative pl-6 border-l border-mono-800 flex flex-col gap-8 my-4" stagger={0.1}>
           {MILESTONES.map((item, index) => (
-            <div key={index} className="relative group">
+            <StaggerItem key={index} className="relative group">
               {/* Timeline Dot Indicator */}
               <div className="absolute -left-[31px] top-1.5 w-3 h-3 rounded-full bg-black border-2 border-mono-600 group-hover:border-white group-hover:scale-125 transition-all" />
 
@@ -50,9 +52,9 @@ export default function AboutTimeline() {
               <p className="text-xs text-mono-300 font-light leading-relaxed max-w-xl">
                 {item.description}
               </p>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerList>
       </div>
     </div>
   );

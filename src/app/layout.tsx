@@ -6,6 +6,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ServiceWorkerCleanup from "@/components/utils/ServiceWorkerCleanup";
 import CatMascot from "@/components/mascot/CatMascot";
+import MotionProvider from "@/components/motion/MotionProvider";
+import ScrollProgress from "@/components/motion/ScrollProgress";
 
 export const viewport: Viewport = {
   themeColor: "#000000",
@@ -90,12 +92,15 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${outfit.variable} dark`}>
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black">
         <ServiceWorkerCleanup />
-        <SmoothScroll>
-          <Header />
-          <main className="w-full flex flex-col min-h-screen">{children}</main>
-          <Footer />
-          <CatMascot variant="floating" />
-        </SmoothScroll>
+        <MotionProvider>
+          <ScrollProgress />
+          <SmoothScroll>
+            <Header />
+            <main className="w-full flex flex-col min-h-screen">{children}</main>
+            <Footer />
+            <CatMascot variant="floating" />
+          </SmoothScroll>
+        </MotionProvider>
       </body>
     </html>
   );
